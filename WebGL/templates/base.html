@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/static/three.js"></script>
+    <!-- <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"> -->
+    <!-- <link rel="shortcut icon" href="" type="image/x-icon">\ -->
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="icon" href="/static/favicon.png">
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="/static/base.css" type="text/css">
+    {% block title %}
+    {% endblock %}
+    <title>WebGL Gallery</title>
+</head>
+<body>
+    {%include 'sidebar_examples.html'%}
+    
+    <div class="w3-main" style="margin-left:300px;">
+        {% block body %}
+        {% endblock %}
+    
+        <script>
+            {% block java_script %}
+            {% endblock %}
+        </script>
+    </div>
+</body>
+</html>
