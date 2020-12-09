@@ -1,0 +1,94 @@
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: "GmarketSansLight";
+}
+a {
+    color: white;
+    text-decoration: none;
+}
+@font-face {
+    font-family: "GmarketSansLight";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff")
+      format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.w3-theme-l5 {
+    color: #000 !important;
+    background-color: #f6f3ff !important;
+}
+.w3-theme-l4 {
+    color: #000 !important;
+    background-color: #e2d8ff !important;
+}
+  .w3-theme-l3 {
+    color: #000 !important;
+    background-color: #c5b1ff !important;
+}
+.w3-theme-l2 {
+    color: #fff !important;
+    background-color: #a88bff !important;
+}
+.w3-theme-l1 {
+    color: #fff !important;
+    background-color: #8b64ff !important;
+}
+.w3-theme-d1 {
+    color: #fff !important;
+    background-color: #561eff !important;
+}
+.w3-theme-d2 {
+    color: #fff !important;
+    background-color: #3f00fd !important;
+}
+.w3-theme-d3 {
+    color: #fff !important;
+    background-color: #3700dd !important;
+}
+.w3-theme-d4 {
+    color: #fff !important;
+    background-color: #2f00be !important;
+}
+.w3-theme-d5 {
+    color: #fff !important;
+    background-color: #28009e !important;
+}
+  
+.w3-theme-light {
+    color: #000 !important;
+    background-color: #f6f3ff !important;
+}
+.w3-theme-dark {
+    color: #fff !important;
+    background-color: #28009e !important;
+}
+.w3-theme-action {
+    color: #fff !important;
+    background-color: #28009e !important;
+}
+  
+.w3-theme {
+    color: #fff !important;
+    background-color: #6d3bff !important;
+}
+.w3-text-theme {
+    color: #6d3bff !important;
+}
+.w3-border-theme {
+    border-color: #6d3bff !important;
+}
+  
+.w3-hover-theme:hover {
+    color: #fff !important;
+    background-color: #6d3bff !important;
+}
+.w3-hover-text-theme:hover {
+    color: #6d3bff !important;
+}
+.w3-hover-border-theme:hover {
+    border-color: #6d3bff !important;
+}
