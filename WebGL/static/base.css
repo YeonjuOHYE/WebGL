@@ -5,6 +5,14 @@
     box-sizing: border-box;
     font-family: "GmarketSansLight";
 }
+::-webkit-scrollbar {
+    width: 10px;
+    background: transparent; /* make scrollbar transparent */
+}
+::-webkit-scrollbar-thumb {
+    background-color: #5a33cf;
+    border-radius: 20px;
+}
 a {
     color: white;
     text-decoration: none;
@@ -25,7 +33,7 @@ a {
     color: #000 !important;
     background-color: #e2d8ff !important;
 }
-  .w3-theme-l3 {
+.w3-theme-l3 {
     color: #000 !important;
     background-color: #c5b1ff !important;
 }
