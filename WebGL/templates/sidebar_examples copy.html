@@ -1,0 +1,58 @@
+<a class="w3-button w3-hide-large w3-display-topright w3-hover-black w3-large w3-theme" 
+  style="width: 50px; height: 50px;"
+  href="javascript:void(0)" onclick="w3_open()">M</a>
+
+<nav
+  class="w3-sidebar w3-bar-block w3-theme w3-collapse w3-large"
+  style="width: 300px; font-weight: bold"
+  id="mySidebar"
+>
+ <a href="javascript:void(0)" onclick="w3_close()" class="w3-container w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
+    x
+  </a>
+  
+  <a href="{%url 'main:examples'%}">
+    <div class="w3-container w3-padding-32">
+        WebGL Examples
+    </div>
+  </a>
+  
+  <div class="w3-bar-block">
+    {%for project in projects%}
+    <a class="w3-bar-item w3-button w3-hover-white" href="{%url 'main:gl_project' project.project_url%}">
+      <img src="{{project.thumbnail.url}}" style="max-width:100%;" alt="thumbnail"> 
+      {{project.project_name}}
+      {{project.author}}
+      {{project.project_url}}
+      <hr>
+    </a>
+    {%endfor%}
+    
+  </div>
+
+</nav>
+ 
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+</script>
