@@ -2,12 +2,11 @@
 
 {% load static %}
 {% block title %}
-<script src="{% static 'js/basic.js'%}"></script>
+<script type="module" src="{% static 'js/basic.js'%}"></script>
 {% endblock %}
 
 {% block body %}
 {% endblock %}
 
 {% block java_script %}
-    window.onload = onload()
 {% endblock %}
