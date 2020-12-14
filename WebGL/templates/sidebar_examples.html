@@ -14,6 +14,32 @@
     {%for project in projects%}
     <a class="w3-bar-item w3-card w3-margin-bottom w3-button w3-hover-white"
       href="{%url 'main:gl_project' project.project_url%}">
+      {%if project.project_url == current_project.project_url%}
+        <form action="{% url 'main:update_thumbnail' current_project.project_url %}" method="POST" >
+        {% csrf_token %}
+          <button class="w3-right w3-button w3-theme-d1" style="padding: 4px 10px 0px 10px; "onclick="makeImage()">썸네일 수정</button>
+          <input hidden id="new_thumbnail_base64" name="new_thumbnail_base64" value=""></button>
+          <canvas id="myCanvas" width="200" height="100" style="border:1px solid #d3d3d3;">
+          Your browser does not support the HTML canvas tag.</canvas>
+          <script>
+          var c = document.getElementById("myCanvas");
+          var ctx = c.getContext("2d");
+          ctx.moveTo(0, 0);
+          ctx.lineTo(200, 100);
+          ctx.stroke();
+
+          base64 = c.toDataURL()
+          console.log(base64)
+
+          function makeImage(){
+            var d = document.getElementById("threejs_canvas");
+            console.log(d)
+            $("#new_thumbnail_base64").val(base64)
+          }
+          </script>
+        </form>
+      {% endif %}
+      
       <img src="{{project.thumbnail.url}}" style="max-width:100%;" alt="thumbnail">
       <br>
       <span>
