@@ -4,7 +4,7 @@ from .models import webgl_project
 import os
 import base64
 import datetime as pydatetime
-
+import json
 # Create your views here.
 def index(request):
     return redirect("main:examples")
@@ -59,8 +59,14 @@ def update_thumbnail(request, project_url):
     current_project.thumbnail = new_filename
     current_project.save()
 
+    # context = {
+    #     "projects": projects,
+    #     "current_project": current_project,
+    #     "new_url":new_filename
+    # }
     context = {
-        "projects": projects,
-        "current_project": current_project,
+        'new_url':new_filename
     }
-    return redirect("main:gl_project", project_url=project_url)
+    print(context)
+    return HttpResponse(json.dumps(context), content_type="application/json")
+    # return redirect("main:gl_project", project_url=project_url)

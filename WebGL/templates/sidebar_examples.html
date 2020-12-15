@@ -20,23 +20,20 @@
       {% csrf_token %}
       <input hidden id="new_thumbnail_base64" name="new_thumbnail_base64" value=""></input>
 
-      <script type="module">
-        // import { GetDataURLforCapture } from "{% static project.project_url %}"
-
+      <script>
         function changeThumbnail() {
           var threejs_canvas = $('#threejs_canvas')[0];
           var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']")[0];
           var new_thumbnail_base64 = $('#new_thumbnail_base64')[0];
-          // let base64 = GetDataURLforCapture()
 
-          // console.log(base64)
           console.log(csrfmiddlewaretoken.value)
           console.log(new_thumbnail_base64.value)
 
           let canvas = $('#threejs_canvas').children("canvas")[0];
+          console.log(canvas)
           let base64 = canvas.toDataURL()
           console.log(base64)
-          // base64 = b.toDataURL()
+
           $.ajax({
             url: "{% url 'main:update_thumbnail' current_project.project_url %}",
             data: {
@@ -45,8 +42,9 @@
             },
             type: "POST"
           })
-            .done(function () {
-              window.location.href = "{%url 'main:gl_project' project.project_url%}"
+            .done(function (response) {
+              $("#img_{{project.project_url}}")[0].src = "/media/" + response['new_url']
+              Snackbar(true)
             })
             .fail(function () {
               console.log("요청 실패({{project.project_url}})");
