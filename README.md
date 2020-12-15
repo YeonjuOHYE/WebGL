@@ -3,6 +3,8 @@ Web-GL study
 ---
 
 ```
+git clone https://github.com/YeonjuOHYE/WebGL.git
+cd WebGL
 pip install -r requirements.txt
 cd WebGL
 python manager.py runserver
