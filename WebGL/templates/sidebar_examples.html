@@ -26,13 +26,9 @@
           var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']")[0];
           var new_thumbnail_base64 = $('#new_thumbnail_base64')[0];
 
-          console.log(csrfmiddlewaretoken.value)
-          console.log(new_thumbnail_base64.value)
-
           let canvas = $('#threejs_canvas').children("canvas")[0];
           console.log(canvas)
           let base64 = canvas.toDataURL()
-          console.log(base64)
 
           $.ajax({
             url: "{% url 'main:update_thumbnail' current_project.project_url %}",
@@ -47,12 +43,8 @@
               Snackbar(true)
             })
             .fail(function () {
-              console.log("요청 실패({{project.project_url}})");
               Snackbar(false)
             })
-            .always(function () {
-              console.log("요청 완료({{project.project_url}})");
-            });
         }
 
         $('#change_button')[0].addEventListener('click', changeThumbnail)

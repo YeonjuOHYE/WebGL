@@ -1,8 +1,7 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 
 let scene, renderer, camera, controls
-let cube, plane, line
-let planeAnchor
+let cube;
 
 start();
 update();
@@ -20,44 +19,25 @@ function start() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("threejs_canvas").appendChild(renderer.domElement);
 
-    camera.position.set(0, 3, 5);
+    camera.position.set(0, 0, 3);
     camera.lookAt(0, 0, 0);
-    controls = new OrbitControls(camera, renderer.domElement)
 
+    //set camera for mouse rotation
+    controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    //create a yellow cube
-    const geometry_box = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
-    const blue_material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
-    cube = new THREE.Mesh(geometry_box, blue_material);
-    cube.position.set(-1, 0, 0)
-    scene.add(cube);
 
-
-    const geometry_plane = new THREE.PlaneBufferGeometry(1, 1);
-    const plane_material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-    plane = new THREE.Mesh(geometry_plane, plane_material);
-    plane.material.side = THREE.DoubleSide;
-    planeAnchor = new THREE.Group();
-    plane.position.set(1, 0, 0)
-    // plane.rotation.y = 0
-    planeAnchor.add(plane)
-    scene.add(planeAnchor);
-
-
-    //create a blue LineBasicMaterial
-    const yellow_material = new THREE.LineBasicMaterial({
-        color: 0xffff00,
+    //create a cube after texture loaded
+    const loader = new THREE.TextureLoader();
+    loader.load('/media/main/texture_gui/Lenna.png', (texture) => {
+        const geometry_box = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshPhongMaterial({
+            map: texture
+        });
+        cube = new THREE.Mesh(geometry_box, material);
+        scene.add(cube);
     });
-    const points = [];
-    points.push(new THREE.Vector3(- 1.5, 0, 0));
-    points.push(new THREE.Vector3(0, 1.5, -1.5));
-    points.push(new THREE.Vector3(1.5, 0, 0));
-    points.push(new THREE.Vector3(- 1.5, 0, 0));
-    const geometry_line = new THREE.BufferGeometry().setFromPoints(points);
-    line = new THREE.Line(geometry_line, yellow_material);
 
-    scene.add(line);
 
     // lights
     const dirLight1 = new THREE.DirectionalLight(0xffffff);
@@ -77,12 +57,12 @@ function start() {
 //update
 function update() {
     requestAnimationFrame(update);
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-    planeAnchor.rotation.y += 0.01;
-    plane.rotation.y += 0.01;
+    const speed = 0.01
+    if (cube) {
+        cube.rotation.x += speed;
+        cube.rotation.y += speed;
+    }
     controls.update();
-    // plane.rotation.x += 0.01;
     renderer.render(scene, camera);
 };
 
