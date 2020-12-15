@@ -1,50 +1,113 @@
+{% load static %}
 <!-- Side Navigation -->
-<nav class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-theme" style="display:none; overflow-x: hidden;" id="mySidebar">
+<nav class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-theme" style="display:none; overflow-x: hidden;"
+  id="mySidebar">
   <!--close button -->
   <i onclick="w3_close()" class="fa fa-close w3-xlarge w3-button w3-theme" style="position:fixed"></i>
   <div class="w3-center w3-padding-32">
     <a href="{%url 'main:examples'%}">
       <div class="w3-padding-32 w3-xxlarge">
-          <b>WebGL<br>Examples</b>  
+        <b>WebGL<br>Examples</b>
       </div>
     </a>
   </div>
   <div class="w3-container 3-bar-block">
     {%for project in projects%}
-    <a class="w3-bar-item w3-card w3-margin-bottom w3-button w3-hover-white" href="{%url 'main:gl_project' project.project_url%}">
-      <img src="{{project.thumbnail.url}}" style="max-width:100%;" alt="thumbnail"> 
-      <br>
-      <span>
-        {{project.project_name}}
-      </span>
-      <span class="w3-right">
-      {{project.author}}
-      </span>
-    </a>
+    <div class="w3-card w3-margin-bottom">
+      {%if project.project_url == current_project.project_url%}
+      <button id="change_button" class="w3-right w3-button w3-theme-d1" style="padding: 4px 10px 0px 10px;">썸네일
+        수정</button>
+      {% csrf_token %}
+      <input hidden id="new_thumbnail_base64" name="new_thumbnail_base64" value=""></input>
+
+      <script>
+        function changeThumbnail() {
+          var threejs_canvas = $('#threejs_canvas')[0];
+          var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']")[0];
+          var new_thumbnail_base64 = $('#new_thumbnail_base64')[0];
+
+          console.log(csrfmiddlewaretoken.value)
+          console.log(new_thumbnail_base64.value)
+
+          let canvas = $('#threejs_canvas').children("canvas")[0];
+          console.log(canvas)
+          let base64 = canvas.toDataURL()
+          console.log(base64)
+
+          $.ajax({
+            url: "{% url 'main:update_thumbnail' current_project.project_url %}",
+            data: {
+              "csrfmiddlewaretoken": csrfmiddlewaretoken.value,
+              "new_thumbnail_base64": base64
+            },
+            type: "POST"
+          })
+            .done(function (response) {
+              $("#img_{{project.project_url}}")[0].src = "/media/" + response['new_url']
+              Snackbar(true)
+            })
+            .fail(function () {
+              console.log("요청 실패({{project.project_url}})");
+              Snackbar(false)
+            })
+            .always(function () {
+              console.log("요청 완료({{project.project_url}})");
+            });
+        }
+
+        $('#change_button')[0].addEventListener('click', changeThumbnail)
+      </script>
+      {% endif %}
+      <a class="w3-bar-item  w3-button  w3-hover-white" href="{%url 'main:gl_project' project.project_url%}">
+        <img id="img_{{project.project_url}}" src="{{project.thumbnail.url}}" style="max-width:100%;" alt="thumbnail">
+        <br>
+        <span>
+          {{project.project_name}}
+        </span>
+        <span class="w3-right">
+          {{project.author}}
+        </span>
+      </a>
+    </div>
     {%endfor%}
-    
   </div>
+  <div id="snackbar">Some text some message..</div>
+  <script>
+    function Snackbar(success) {
+      var x = $("#snackbar")[0];
+      if (success) {
+        x.className = "show w3-green";
+        x.textContent = "썸네일 변경 성공"
+      }
+      else {
+        x.className = "show w3-red";
+        x.textContent = "썸네일 변경 실패"
+      }
+
+      setTimeout(function () { x.className = x.className.replace("show", ""); }, 2000);
+    }
+  </script>
 </nav>
 
 <!-- Header -->
 <i onclick="w3_open()" class="fa fa-bars w3-xlarge w3-button w3-theme" style="position:fixed"></i>
 
- 
+
 <script>
-// Side navigation
-function w3_open() {
-  var x = document.getElementById("mySidebar");
-  ratio = window.innerWidth / window.innerHeight
-  if(ratio <= 1){
-    x.style.width = "100%";
+  // Side navigation
+  function w3_open() {
+    var x = document.getElementById("mySidebar");
+    ratio = window.innerHeight / window.innerWidth
+    if (ratio >= 1.32) {
+      x.style.width = "100%";
+    }
+    else {
+      x.style.width = "25%";
+    }
+
+    x.style.display = "block";
   }
-  else{
-    x.style.width = "25%";
+  function w3_close() {
+    document.getElementById("mySidebar").style.display = "none";
   }
-  
-  x.style.display = "block";
-}
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-}
 </script>

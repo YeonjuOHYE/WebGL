@@ -11,7 +11,7 @@ function start() {
     console.log("basic.js onload")
     // start
     scene = new THREE.Scene();
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
     scene.background = new THREE.Color(0x303030);
     scene.fog = new THREE.FogExp2(0x000000, 0.002);
@@ -28,14 +28,14 @@ function start() {
     controls.dampingFactor = 0.05;
     //create a yellow cube
     const geometry_box = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
-    const blue_material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+    const blue_material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
     cube = new THREE.Mesh(geometry_box, blue_material);
     cube.position.set(-1, 0, 0)
     scene.add(cube);
 
 
     const geometry_plane = new THREE.PlaneBufferGeometry(1, 1);
-    const plane_material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const plane_material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
     plane = new THREE.Mesh(geometry_plane, plane_material);
     plane.material.side = THREE.DoubleSide;
     planeAnchor = new THREE.Group();
@@ -58,6 +58,18 @@ function start() {
     line = new THREE.Line(geometry_line, yellow_material);
 
     scene.add(line);
+
+    // lights
+    const dirLight1 = new THREE.DirectionalLight(0xffffff);
+    dirLight1.position.set(1, 1, 1);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x002288);
+    dirLight2.position.set(- 1, - 1, - 1);
+    scene.add(dirLight2);
+
+    const ambientLight = new THREE.AmbientLight(0x222222);
+    scene.add(ambientLight);
 
     //window resize 대응
     window.addEventListener('resize', onWindowResize, false);
