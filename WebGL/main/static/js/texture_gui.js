@@ -11,7 +11,7 @@ function start() {
     console.log("basic.js onload")
     // start
     scene = new THREE.Scene();
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
     scene.background = new THREE.Color(0x303030);
     scene.fog = new THREE.FogExp2(0x000000, 0.002);

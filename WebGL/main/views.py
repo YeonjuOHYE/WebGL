@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from .models import webgl_project
 import os
 import base64
-
+import datetime as pydatetime
 
 # Create your views here.
 def index(request):
@@ -32,20 +32,27 @@ def gl_project(request, project_url):
 def update_thumbnail(request, project_url):
     print("update_thumbnail")
     print(request.POST)
+
     projects = webgl_project.objects.all()
     current_project = webgl_project.objects.get(project_url=project_url)
 
     path = os.path.join(os.getcwd(), "media")
 
     previous_url = str(current_project.thumbnail)
+    print("previous_url : ",previous_url)
     if previous_url != "thumbnail_default.jpg":
         previous_path = os.path.join(path, previous_url)
         if os.path.isfile(previous_path):
+            print("removed : ",previous_path)
             os.remove(previous_path)
 
     imgdata = base64.b64decode(request.POST["new_thumbnail_base64"].split(",")[1])
-    new_filename = os.path.join("thumbnail", project_url) + ".png"
+    timestamp = pydatetime.datetime.now().timestamp()
+
+    print(int(timestamp))
+    new_filename = os.path.join("thumbnail", project_url) + str(int(timestamp))+".png"
     new_path = os.path.join(path, new_filename)
+    print("new_path : ",new_path)
     with open(new_path, "wb") as f:
         f.write(imgdata)
 

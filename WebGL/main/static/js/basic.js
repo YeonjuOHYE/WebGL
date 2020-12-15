@@ -12,7 +12,7 @@ function start() {
     console.log("basic.js onload")
     // start
     scene = new THREE.Scene();
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     const gui = new GUI();
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
     scene.background = new THREE.Color(0x303030);
@@ -113,6 +113,7 @@ function start() {
     //window resize 대응
     window.addEventListener('resize', onWindowResize, false);
 }
+
 //update
 function update() {
     requestAnimationFrame(update);
@@ -120,6 +121,7 @@ function update() {
     cube.rotation.y += 0.01;
     planeAnchor.rotation.y += 0.01;
     plane.rotation.y += 0.01;
+    // console.log()
     controls.update();
 
     renderer.render(scene, camera);
@@ -129,7 +131,6 @@ function makeAxisGrid(node, label, units) {
     const helper = new AxisGridHelper(node, units);
     gui.add(helper, 'visible').name(label);
 }
-
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
