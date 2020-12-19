@@ -3,7 +3,14 @@
 <nav class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-theme" style="display:none; overflow-x: hidden;"
   id="mySidebar">
   <!--close button -->
-  <i onclick="w3_close()" class="fa fa-close w3-xlarge w3-button w3-theme" style="position:fixed"></i>
+  <div style="position:fixed;" class="w3-theme">
+  <i onclick="w3_close()" class="fa fa-close w3-xlarge w3-button w3-theme" ></i>
+  <!-- <div class="" style="display: inline"> -->
+    <!-- <i class="fa fa-search" ></i> -->
+    <input class="searchinput w3-large w3-round-xxlarge w3-border-0" style="display: fixed" type="text" name='query' placeholder="  검색" width="200" onkeyup="mySearchFunction(this)">
+  <!-- </div> -->
+  </div>
+
   <div class="w3-center w3-padding-32">
     <a href="{%url 'main:examples'%}">
       <div class="w3-padding-32 w3-xxlarge">
@@ -13,7 +20,7 @@
   </div>
   <div class="w3-container 3-bar-block">
     {%for project in projects%}
-    <div class="w3-card w3-margin-bottom">
+    <div class="w3-card w3-margin-bottom card">
       {%if project.project_url == current_project.project_url%}
       <button id="change_button" class="w3-right w3-button w3-theme-d1" style="padding: 4px 10px 0px 10px;">썸네일
         수정</button>
@@ -53,16 +60,45 @@
       <a class="w3-bar-item  w3-button  w3-hover-white" href="{%url 'main:gl_project' project.project_url%}">
         <img id="img_{{project.project_url}}" src="{{project.thumbnail.url}}" style="max-width:100%;" alt="thumbnail">
         <br>
-        <span>
+        <span class="project_name">
           {{project.project_name}}
         </span>
-        <span class="w3-right">
+        <span class="w3-right project_author">
           {{project.author}}
         </span>
       </a>
     </div>
     {%endfor%}
   </div>
+  <script>
+    function mySearchFunction(input) {
+      var cards = $('.card')
+      var query = input.value
+      var query_atoh = AtoH.convert(query)
+
+      console.log(AtoH.convert(query))
+
+      $.each(cards, function(index, card){
+        a = $(card).children()
+        
+        card.style.display = 'inline-block'
+        if(
+          !(
+            a.children(".project_name")[0].innerText.toLowerCase().includes(query.toLowerCase()) ||
+            a.children(".project_author")[0].innerText.toLowerCase().includes(query.toLowerCase()) ||
+            a.children(".project_name")[0].innerText.toLowerCase().includes(query_atoh) ||
+            a.children(".project_author")[0].innerText.toLowerCase().includes(query_atoh)
+            )
+           ) 
+        {
+          card.style.display = 'none'
+        }
+
+        a.children(".project_name").innerText
+        a.children(".project_author").innerText
+      });
+    }
+  </script>
   <div id="snackbar">Some text some message..</div>
   <script>
     function Snackbar(success) {
@@ -89,16 +125,28 @@
   // Side navigation
   function w3_open() {
     var x = document.getElementById("mySidebar");
+    var y = $(".searchinput")
+    var z = $(".fa-close")
     ratio = window.innerHeight / window.innerWidth
     if (ratio >= 1.32) {
       x.style.width = "100%";
     }
     else {
       x.style.width = "25%";
+      
     }
 
     x.style.display = "block";
+    y.css('width',x.offsetWidth - z[0].offsetWidth - 20)
   }
+
+  window.addEventListener('resize',function(){
+    var x = document.getElementById("mySidebar");
+    var y = $(".searchinput")
+    var z = $(".fa-close")
+    y.css('width',x.offsetWidth - z[0].offsetWidth - 20)
+  })
+
   function w3_close() {
     document.getElementById("mySidebar").style.display = "none";
   }
