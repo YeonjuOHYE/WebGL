@@ -1,136 +1,100 @@
-import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 import { GUI } from '../jsm/gui/dat.gui.module.js';
 
-let scene, renderer, camera, controls
-let cube, plane, line
-let planeAnchor
-
+let scene, renderer, camera
+let cubes
 start();
 update();
 
 function start() {
     console.log("basic.js onload")
     // start
-    scene = new THREE.Scene();
+
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-    const gui = new GUI();
-    camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-    scene.background = new THREE.Color(0x303030);
-    scene.fog = new THREE.FogExp2(0x000000, 0.002);
+    const near = 3
+    const far = 8
+    const color = 0xafb7a0
+    camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, near, far);
+    scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(color, 4, 5);
+    scene.background = new THREE.Color(color);
+    camera.position.z = 5;
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("threejs_canvas").appendChild(renderer.domElement);
 
-    camera.position.set(0, 3, 5);
-    camera.lookAt(0, 0, 0);
-    controls = new OrbitControls(camera, renderer.domElement)
-
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    //create a yellow cube
-    const geometry_box = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
-    const blue_material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
-    cube = new THREE.Mesh(geometry_box, blue_material);
-    cube.position.set(-1, 0, 0)
-
-    // Turns both axes and grid visible on/off
-    // GUI requires a property that returns a bool
-    // to decide to make a checkbox so we make a setter
-    // can getter for `visible` which we can tell GUI
-    // to look at.
-    class AxisGridHelper {
-        constructor(node, units = 10) {
-            const axes = new THREE.AxesHelper();
-            axes.material.depthTest = false;
-            axes.renderOrder = 2;  // after the grid
-            node.add(axes);
-
-            const grid = new THREE.GridHelper(units, units);
-            grid.material.depthTest = false;
-            grid.renderOrder = 1;
-            node.add(grid);
-
-            this.grid = grid;
-            this.axes = axes;
-            this.visible = true;
+    //attach gui
+    class FogGUIHelper {
+        constructor(fog, backgroundColor) {
+            this.fog = fog;
+            this.backgroundColor = backgroundColor;
         }
-        get visible() {
-            return this._visible;
+        get near() {
+            return this.fog.near;
         }
-        set visible(v) {
-            this._visible = v;
-            this.grid.visible = v;
-            this.axes.visible = v;
+        set near(v) {
+            this.fog.near = v;
+            this.fog.far = Math.max(this.fog.far, v)
+        }
+        get far() {
+            return this.fog.far;
+        }
+        set far(v) {
+            this.fog.far = v;
+            this.fog.near = Math.min(this.fog.near, v)
+        }
+        get color() {
+            return `#${this.fog.color.getHexString()}`;
+        }
+        set color(hexString) {
+            this.fog.color.set(hexString);
+            this.backgroundColor.set(hexString);
         }
     }
+    const gui = new GUI()
+    const fogGUIHelper = new FogGUIHelper(scene.fog, scene.background)
+    gui.add(fogGUIHelper, 'near', near, far).listen()
+    gui.add(fogGUIHelper, 'far', near, far).listen()
+    gui.addColor(fogGUIHelper, 'color')
 
-    function makeAxisGrid(node, label, units) {
-        const helper = new AxisGridHelper(node, units);
-        gui.add(helper, 'visible').name(label);
+    // cube
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    function makeInstance(geometry, color, x) {
+        const material = new THREE.MeshPhongMaterial({ color });
+
+        const cube = new THREE.Mesh(geometry, material)
+        scene.add(cube);
+
+        cube.position.x = x;
+        return cube;
     }
 
-    makeAxisGrid(cube, 'cubeMesh', 5);
-    scene.add(cube);
+    cubes = [
+        makeInstance(geometry, 0x8844aa, -2),
+        makeInstance(geometry, 0x44aa88, 0),
+        makeInstance(geometry, 0xaa8844, 2)
+    ];
 
-
-    const geometry_plane = new THREE.PlaneBufferGeometry(1, 1);
-    const plane_material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-    plane = new THREE.Mesh(geometry_plane, plane_material);
-    plane.material.side = THREE.DoubleSide;
-    planeAnchor = new THREE.Group();
-    plane.position.set(1, 0, 0)
-    planeAnchor.add(plane)
-    scene.add(planeAnchor);
-
-
-    //create a blue LineBasicMaterial
-    const yellow_material = new THREE.LineBasicMaterial({
-        color: 0xffff00,
-    });
-    const points = [];
-    points.push(new THREE.Vector3(- 1.5, 0, 0));
-    points.push(new THREE.Vector3(0, 1.5, -1.5));
-    points.push(new THREE.Vector3(1.5, 0, 0));
-    points.push(new THREE.Vector3(- 1.5, 0, 0));
-    const geometry_line = new THREE.BufferGeometry().setFromPoints(points);
-    line = new THREE.Line(geometry_line, yellow_material);
-
-    scene.add(line);
 
     // lights
-    const dirLight1 = new THREE.DirectionalLight(0xffffff);
-    dirLight1.position.set(1, 1, 1);
-    scene.add(dirLight1);
-
-    const dirLight2 = new THREE.DirectionalLight(0x002288);
-    dirLight2.position.set(- 1, - 1, - 1);
-    scene.add(dirLight2);
-
-    const ambientLight = new THREE.AmbientLight(0x222222);
-    scene.add(ambientLight);
+    const light = new THREE.DirectionalLight(0xffffff, 1)
+    light.position.set(-1, 2, 4);
+    scene.add(light)
 
     //window resize 대응
     window.addEventListener('resize', onWindowResize, false);
 }
-
 //update
 function update() {
     requestAnimationFrame(update);
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-    planeAnchor.rotation.y += 0.01;
-    plane.rotation.y += 0.01;
-    // console.log()
-    controls.update();
+    cubes.forEach((cube, ndx) => {
+        const speed = 0.005
 
+        cube.rotation.x += speed;
+        cube.rotation.y += speed;
+    })
     renderer.render(scene, camera);
 };
-
-function makeAxisGrid(node, label, units) {
-    const helper = new AxisGridHelper(node, units);
-    gui.add(helper, 'visible').name(label);
-}
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;

@@ -5,6 +5,7 @@ import os
 import base64
 import datetime as pydatetime
 import json
+
 # Create your views here.
 def index(request):
     return redirect("main:examples")
@@ -39,34 +40,25 @@ def update_thumbnail(request, project_url):
     path = os.path.join(os.getcwd(), "media")
 
     previous_url = str(current_project.thumbnail)
-    print("previous_url : ",previous_url)
+    print("previous_url : ", previous_url)
     if previous_url != "thumbnail_default.jpg":
         previous_path = os.path.join(path, previous_url)
         if os.path.isfile(previous_path):
-            print("removed : ",previous_path)
+            print("removed : ", previous_path)
             os.remove(previous_path)
 
     imgdata = base64.b64decode(request.POST["new_thumbnail_base64"].split(",")[1])
     timestamp = pydatetime.datetime.now().timestamp()
 
     print(int(timestamp))
-    new_filename = os.path.join("thumbnail", project_url) + str(int(timestamp))+".png"
+    new_filename = os.path.join("thumbnail", project_url) + str(int(timestamp)) + ".png"
     new_path = os.path.join(path, new_filename)
-    print("new_path : ",new_path)
+    print("new_path : ", new_path)
     with open(new_path, "wb") as f:
         f.write(imgdata)
 
     current_project.thumbnail = new_filename
     current_project.save()
 
-    # context = {
-    #     "projects": projects,
-    #     "current_project": current_project,
-    #     "new_url":new_filename
-    # }
-    context = {
-        'new_url':new_filename
-    }
-    print(context)
+    context = {"new_url": new_filename}
     return HttpResponse(json.dumps(context), content_type="application/json")
-    # return redirect("main:gl_project", project_url=project_url)

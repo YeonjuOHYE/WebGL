@@ -7,7 +7,7 @@
   <i onclick="w3_close()" class="fa fa-close w3-xlarge w3-button w3-theme" ></i>
   <!-- <div class="" style="display: inline"> -->
     <!-- <i class="fa fa-search" ></i> -->
-    <input class="searchinput w3-large w3-round-xxlarge w3-border-0" style="display: fixed" type="text" name='query' placeholder="  검색" width="200" onkeyup="mySearchFunction(this)">
+    <input class="searchinput w3-large w3-border-0" style="display: fixed" type="text" name='query' placeholder=" 검색" width="200" onkeyup="mySearchFunction(this)">
   <!-- </div> -->
   </div>
 
@@ -34,7 +34,6 @@
           var new_thumbnail_base64 = $('#new_thumbnail_base64')[0];
 
           let canvas = $('#threejs_canvas').children("canvas")[0];
-          console.log(canvas)
           let base64 = canvas.toDataURL()
 
           $.ajax({
