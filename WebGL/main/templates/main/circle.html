@@ -1,0 +1,14 @@
+{% extends 'base.html' %} {% load static %} {% block title %} {% endblock %} {%
+block body %}
+<canvas
+  id="glcanvas"
+  style="width: 100vw; height: 100vh; display: block"
+></canvas>
+<script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"
+  integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+  crossorigin="anonymous"
+></script>
+<script src="/static/js/circle.js"></script>
+{% endblock %}
