@@ -1,5 +1,4 @@
 {% extends 'base.html' %} {% load static %} {% block title %}
-<canvas id="c"></canvas>
 <script id="2d-vertex-shader" type="notjs">
 
 
@@ -19,6 +18,8 @@
     gl_FragColor = vec4(fragColor, 1.0);
   }
 </script>
+{% endblock %} {% block body %}
+<canvas id="c"></canvas>
 
 <!--
   for most samples webgl-utils only provides shader compiling/linking and
@@ -29,4 +30,4 @@
   -->
 <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
 <script src="/static/js/triangle.js"></script>
-{% endblock %} {% block body %} {% endblock %}
+{% endblock %}
