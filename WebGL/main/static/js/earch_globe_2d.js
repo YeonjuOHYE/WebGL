@@ -48,14 +48,17 @@ function drawData(file) {
     document.getElementById("threejs_canvas").appendChild(canvas);
     const ctx = canvas.getContext('2d');
     // make the canvas the same size as the data
-    ctx.canvas.width = ncols * 2;
-    ctx.canvas.height = nrows * 2;
+    
+    ctx.canvas.width = window.outerWidth ;
+    ctx.canvas.height = window.outerWidth *nrows/ncols ;
     ctx.fillStyle = '#444';
 
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     console.log(file);
+    console.log(window.outerWidth * 1 / data.length)
     data.forEach((row, latNdx) => { //145
         row.forEach((value, lonNdx) => {
+
             if (value === undefined) {
                 return;
             }
@@ -64,7 +67,7 @@ function drawData(file) {
             const saturation = 1;
             const lightness = amount;
             ctx.fillStyle = hsl(hue, saturation, lightness);
-            ctx.fillRect(lonNdx * 2, latNdx * 2, 1.2, 1.2);
+            ctx.fillRect(window.outerWidth * lonNdx / row.length ,window.outerWidth *nrows *latNdx/(ncols*data.length), window.outerWidth/700 , window.outerWidth/700);
             // ctx.fillRect(lonNdx, latNdx, 1, 1);
         });
     });
