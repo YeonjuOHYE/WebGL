@@ -32,7 +32,6 @@ def gl_project(request, project_url):
 
 def update_thumbnail(request, project_url):
     print("update_thumbnail")
-    print(request.POST)
 
     projects = webgl_project.objects.all()
     current_project = webgl_project.objects.get(project_url=project_url)
