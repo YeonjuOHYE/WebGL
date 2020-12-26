@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% load static %} {% block title %}
+<script type="module" src="{% static 'js/earch_globe_3d_anim.js'%}"></script>
+<style>
+    #ui {
+        position: absolute;
+        right: 1em;
+        top: 1em;
+    }
+    
+    #ui>div {
+        font-size: 20pt;
+        font-weight: bold;
+        color: #ffffff;
+        padding: 0.5em;
+        display: inline-block;
+    }
+    
+    #ui>div.selected {
+        color: #33ff66;
+    }
+</style>
+{% endblock %} {% block body %}
+<div id="ui"></div>
+{% endblock %}

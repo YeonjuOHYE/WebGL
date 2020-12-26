@@ -1,9 +1,6 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 
 let scene, renderer, camera, controls
-let cube, plane, line
-let planeAnchor
-
 
 let renderRequested = false;
 
@@ -12,7 +9,7 @@ update();
 
 function start() {
     console.log("js onload")
-    // start
+        // start
     scene = new THREE.Scene()
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100)
@@ -32,7 +29,7 @@ function start() {
     controls.maxDistance = 4;
     controls.update();
 
-    loadFile('/media/main/earth_globe/gpw_v4_basic_demographic_characteristics_rev10_a000_14mt_2010_cntm_1_deg.asc')
+    loadFile('/media/main/earth_globe/data2.asc')
         .then(parseData)
         .then(addBoxes)
         .then(render);
@@ -44,8 +41,7 @@ function start() {
 }
 
 //update
-function update() {
-}
+function update() {}
 
 function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -134,6 +130,7 @@ async function loadFile(url) {
     const req = await fetch(url);
     return req.text()
 }
+
 function parseData(text) {
     const data = [];
     const settings = { data };
@@ -146,8 +143,7 @@ function parseData(text) {
         if (parts.length === 2) {
             //only 2 parts, must be a key/value pair
             settings[parts[0]] = parseFloat(parts[1])
-        }
-        else if (parts.length > 2) {
+        } else if (parts.length > 2) {
             //more than 2 parts, must be data
             const values = parts.map((v) => {
                 // parts list를 순회하면서 해당하는 파라미터를 넣은 리스트 생성
