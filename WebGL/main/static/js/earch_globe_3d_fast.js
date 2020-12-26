@@ -1,5 +1,5 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
-
+import { BufferGeometryUtils } from '../jsm/utils/BufferGeometryUtils.js'
 let scene, renderer, camera, controls
 let cube, plane, line
 let planeAnchor
@@ -8,11 +8,10 @@ let planeAnchor
 let renderRequested = false;
 
 start();
-update();
 
 function start() {
     console.log("js onload")
-    // start
+        // start
     scene = new THREE.Scene()
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100)
@@ -37,14 +36,22 @@ function start() {
         .then(addBoxes)
         .then(render);
 
+    // lights
+    const dirLight1 = new THREE.DirectionalLight(0xffffff);
+    dirLight1.position.set(1, 1, 1);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x002288);
+    dirLight2.position.set(-1, -1, -1);
+    scene.add(dirLight2);
+
+    const ambientLight = new THREE.AmbientLight(0x222222);
+    scene.add(ambientLight);
+
     //render를 매 프레임 호출하지 않고, 변화가 있을 시에만 렌더링
     controls.addEventListener('change', requestRenderIfNotRequested);
     window.addEventListener('resize', requestRenderIfNotRequested);
     render()
-}
-
-//update
-function update() {
 }
 
 function resizeRendererToDisplaySize(renderer) {
@@ -78,15 +85,9 @@ function requestRenderIfNotRequested() {
 }
 
 function addBoxes(file) {
-    console.log(file)
     // object 형식은 다음과 같이 변수명이 같으면 리턴 가능.. 신기 ..
     const { min, max, data } = file;
     const range = max - min;
-
-    //초기 생성은 scale값이 아님. 
-    const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-    //중심scale 축은 유지하면서? translation만 적용 = anchor 효과
-    geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
     //longitude (y 축 회전 yaw-도리도리)
     const lonHelper = new THREE.Object3D();
@@ -99,9 +100,17 @@ function addBoxes(file) {
     positionHelper.position.z = 1;
     latHelper.add(positionHelper)
 
+    const originHelper = new THREE.Object3D();
+    originHelper.position.z = 0.5;
+    positionHelper.add(originHelper);
+
+    const color = new THREE.Color();
+
     //data offset for texture mapping
     const lonFudge = Math.PI * -0.7;
     const latFudge = Math.PI * -0.05;
+
+    const geometries = [];
 
     data.forEach((row, latNdx) => {
         row.forEach((value, lonNdx) => {
@@ -111,30 +120,65 @@ function addBoxes(file) {
             }
             //0~1 normalization
             const amount = (value - min) / range;
-            const material = new THREE.MeshBasicMaterial();
-            const hue = THREE.MathUtils.lerp(0.4, 0.7, amount)
-            const satureation = 1;
-            const lightness = THREE.MathUtils.lerp(0.4, 1.0, amount);
-            material.color.setHSL(hue, satureation, lightness);
-            const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
+
+            const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
             // adjust the helpers to point to the latitude and longitude
             lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
             latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
 
+            positionHelper.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
+
             //recursively updates global transform of ancestors.
-            positionHelper.updateWorldMatrix(true, false);
-            mesh.applyMatrix4(positionHelper.matrixWorld);
-            mesh.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
+            originHelper.updateWorldMatrix(true, false);
+            geometry.applyMatrix4(originHelper.matrixWorld);
+
+            //calculate color
+            const hue = THREE.MathUtils.lerp(0.1, 0.4, amount);
+            const saturation = 1;
+            const lightness = THREE.MathUtils.lerp(0.4, 1, amount);
+            color.setHSL(hue, saturation, lightness);
+
+            //get rgb (0~255)
+            // 차후에 0~1로 normalize (0~255할 것이지만, 우리는 한 color 당 8bit 만 쓰면 되므로 float를 쓰지 않는다.
+
+            const rgb = color.toArray().map(v => v * 255) //rgba
+
+            //save color for each vertex
+            const numVerts = geometry.getAttribute('position').count; //24 정육면체
+            const itemSize = 3; //rgb
+            //256 float는 기본 32bit다.
+            const colors = new Uint8Array(itemSize * numVerts); //vertex * 3 개의 색상 어레이 생성
+
+            colors.forEach((v, ndx) => {
+                colors[ndx] = rgb[ndx % 3] //vertexcolor는 순서대로 8bit rgb를 가진다. 
+            });
+
+            const normalized = true; //0~255를 0~1 값으로 normalize 하기 위함.
+            //https://threejs.org/docs/#api/en/core/BufferAttribute
+            const colorAttrib = new THREE.BufferAttribute(colors, itemSize, normalized);
+            geometry.setAttribute('color', colorAttrib);
+
+            geometries.push(geometry);
         });
     });
+
+    // ## merge geometry to one object ##
+    // geometries -- Array of BufferGeometry instances.
+    // useGroups -- Whether groups should be generated for the merged geometry or not.
+    const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
+    const material = new THREE.MeshPhongMaterial({
+        vertexColors: THREE.VertexColors
+    });
+    const mesh = new THREE.Mesh(mergedGeometry, material);
+    scene.add(mesh);
 }
 
 async function loadFile(url) {
     const req = await fetch(url);
     return req.text()
 }
+
 function parseData(text) {
     const data = [];
     const settings = { data };
@@ -147,8 +191,7 @@ function parseData(text) {
         if (parts.length === 2) {
             //only 2 parts, must be a key/value pair
             settings[parts[0]] = parseFloat(parts[1])
-        }
-        else if (parts.length > 2) {
+        } else if (parts.length > 2) {
             //more than 2 parts, must be data
             const values = parts.map((v) => {
                 // parts list를 순회하면서 해당하는 파라미터를 넣은 리스트 생성

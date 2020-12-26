@@ -78,7 +78,6 @@ function requestRenderIfNotRequested() {
 }
 
 function addBoxes(file) {
-    console.log(file)
     // object 형식은 다음과 같이 변수명이 같으면 리턴 가능.. 신기 ..
     const { min, max, data } = file;
     const range = max - min;
