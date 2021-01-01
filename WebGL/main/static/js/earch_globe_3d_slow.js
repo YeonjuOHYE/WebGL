@@ -9,7 +9,7 @@ update();
 
 function start() {
     console.log("js onload")
-        // start
+    // start
     scene = new THREE.Scene()
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100)
@@ -41,7 +41,7 @@ function start() {
 }
 
 //update
-function update() {}
+function update() { }
 
 function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;

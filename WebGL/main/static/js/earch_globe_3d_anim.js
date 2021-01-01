@@ -10,7 +10,7 @@ start();
 
 function start() {
     console.log("js onload")
-        // start
+    // start
     scene = new THREE.Scene()
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100)
@@ -108,7 +108,6 @@ async function loadAll() {
         attribute.name = name;
         return attribute;
     });
-
     // morph를 이용하기 위해서 morphTargets를 활성화 해주어야 한다.
     // material 에서 관리하는 것이 좀 특이함
     const material = new THREE.MeshPhongMaterial({

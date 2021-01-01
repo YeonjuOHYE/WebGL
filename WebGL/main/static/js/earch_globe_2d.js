@@ -48,9 +48,9 @@ function drawData(file) {
     document.getElementById("threejs_canvas").appendChild(canvas);
     const ctx = canvas.getContext('2d');
     // make the canvas the same size as the data
-    
-    ctx.canvas.width = window.outerWidth ;
-    ctx.canvas.height = window.outerWidth *nrows/ncols ;
+
+    ctx.canvas.width = window.outerWidth;
+    ctx.canvas.height = window.outerWidth * nrows / ncols;
     ctx.fillStyle = '#444';
 
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -67,7 +67,7 @@ function drawData(file) {
             const saturation = 1;
             const lightness = amount;
             ctx.fillStyle = hsl(hue, saturation, lightness);
-            ctx.fillRect(window.outerWidth * lonNdx / row.length ,window.outerWidth *nrows *latNdx/(ncols*data.length), window.outerWidth/700 , window.outerWidth/700);
+            ctx.fillRect(window.outerWidth * lonNdx / row.length, window.outerWidth * nrows * latNdx / (ncols * data.length), window.outerWidth / 700, window.outerWidth / 700);
             // ctx.fillRect(lonNdx, latNdx, 1, 1);
         });
     });
@@ -78,6 +78,6 @@ function px(v) {
 function hsl(h, s, l) {
     return `hsl(${h * 360 | 0},${s * 100 | 0}%,${l * 100 | 0}%)`;
 }
-loadFile('/media/main/earth_globe/gpw_v4_basic_demographic_characteristics_rev10_a000_14mt_2010_cntm_1_deg.asc')
+loadFile('/media/main/earth_globe/data2.asc')
     .then(parseData)
     .then(drawData)
