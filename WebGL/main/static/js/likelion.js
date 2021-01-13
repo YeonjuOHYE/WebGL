@@ -3,13 +3,14 @@ import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 let scene, renderer, camera, controls
 
 let lion
-let body
-let leg_anchor_l;
-let leg_anchor_r;
-let hair_list;
-let beard_list_r, beard_list_l
+let body, ear_r, ear_l, eye, pupil_l, pupil_r;
+let leg_anchor_l, leg_anchor_r;
+let hair_list, beard_list_r, beard_list_l;
 
+let cross_anchor, propeller_anchor;
 
+let blowing = false
+let currentspeed = 0
 start();
 update();
 
@@ -26,20 +27,20 @@ function start() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("threejs_canvas").appendChild(renderer.domElement);
 
-    camera.position.set(0, 3, 10);
-    camera.lookAt(0, 5, 0);
+    camera.position.set(0, 7, 25);
+    camera.lookAt(0, 0, 0);
 
     //set camera for mouse rotation
-    controls = new OrbitControls(camera, renderer.domElement)
+    // controls = new OrbitControls(camera, renderer.domElement)
 
+    const body_m = new THREE.MeshPhongMaterial({ color: 0xffd377 });
+    const hair_m = new THREE.MeshPhongMaterial({ color: 0xff553e });
+    const eye_m = new THREE.MeshPhongMaterial({ color: 0xffffff });
+    const nose_m = new THREE.MeshPhongMaterial({ color: 0xb07388 });
+    const mouth_m = new THREE.MeshPhongMaterial({ color: 0x000000 });
+    //make lion
     {
-        //make lion
         lion = new THREE.Object3D();
-        const body_m = new THREE.MeshPhongMaterial({ color: 0xffd377 });
-        const hair_m = new THREE.MeshPhongMaterial({ color: 0xff553e });
-        const eye_m = new THREE.MeshPhongMaterial({ color: 0xffffff });
-        const nose_m = new THREE.MeshPhongMaterial({ color: 0xb07388 });
-        const mouth_m = new THREE.MeshPhongMaterial({ color: 0x000000 });
 
         //foot
         const foot_anchor = new THREE.Object3D();
@@ -131,32 +132,98 @@ function start() {
             const beard_anchor_r = new THREE.Object3D();
             const beard_r = new THREE.Mesh(beard_g, nose_m)
             beard_r.position.set(-0.4, 0, 0)
-            beard_list_r.push(beard_r)
             beard_anchor_r.add(beard_r)
+            beard_list_r.push(beard_anchor_r)
             beard_anchor_r.position.set(-0.75 - i % 2 * 0.15, -0.17 * (i + 1), 1.05)
             face.add(beard_anchor_r)
 
             const beard_anchor_l = new THREE.Object3D();
             const beard_l = new THREE.Mesh(beard_g, nose_m)
             beard_l.position.set(0.4, 0, 0)
-            beard_list_l.push(beard_l)
             beard_anchor_l.add(beard_l)
+            beard_list_l.push(beard_anchor_l)
             beard_anchor_l.position.set(0.75 + i % 2 * 0.15, -0.17 * (i + 1), 1.05)
             face.add(beard_anchor_l)
         }
 
         //dot
-        // const dot_g = new THREE.BoxGeometry((2.1, 2.1, 2.1)
+        const dot_g = new THREE.BoxGeometry(2.2, 0.1, 0.1)
+        const dot1 = new THREE.Mesh(dot_g, hair_m)
+        const dot2 = new THREE.Mesh(dot_g, hair_m)
+        const dot3 = new THREE.Mesh(dot_g, hair_m)
+        const dot4 = new THREE.Mesh(dot_g, hair_m)
+        dot1.position.set(0, 0, 0.5)
+        dot2.position.set(0, -0.6, 0.5)
+        dot3.position.set(0, -0.3, 0.7)
+        dot4.position.set(0, -0.4, 0.2)
+        face.add(dot1)
+        face.add(dot2)
+        face.add(dot3)
+        face.add(dot4)
 
+        //ear
+        const ear_g = new THREE.BoxGeometry(0.6, 0.6, 0.2)
+        ear_r = new THREE.Mesh(ear_g, body_m)
+        ear_l = new THREE.Mesh(ear_g, body_m)
+        ear_r.position.set(-1.2, 1.1, -0.8)
+        ear_l.position.set(1.2, 1.1, -0.8)
+        face.add(ear_r)
+        face.add(ear_l)
 
+        //eye & pupil
+        const eye_g = new THREE.BoxGeometry(2.25, 0.8, 0.8)
+        const pupil_g = new THREE.BoxGeometry(0.3, 0.25, 0.25)
+        eye = new THREE.Mesh(eye_g, eye_m)
+        pupil_l = new THREE.Mesh(pupil_g, nose_m)
+        pupil_r = new THREE.Mesh(pupil_g, nose_m)
+        eye.position.set(0, 0.64, -0.3)
+        pupil_l.position.set(1, 0.64, -0.3)
+        pupil_r.position.set(-1, 0.64, -0.3)
+        face.add(eye)
+        face.add(pupil_l)
+        face.add(pupil_r)
 
         face_anchor.add(face)
         head_anchor.add(face_anchor)
     }
-
-
+    lion.position.set(0, -1, 0)
+    lion.rotation.set(0.3, 0.3, 0)
     scene.add(lion)
 
+    //make crosshair
+    {
+        const cross_center_g = new THREE.BoxGeometry(0.25, 0.25, 0.1)
+        cross_anchor = new THREE.Object3D()
+        const cross_center = new THREE.Mesh(cross_center_g, body_m)
+
+        const cross_handle_g = new THREE.BoxGeometry(0.25, 0.25, 0.7)
+        const cross_handle = new THREE.Mesh(cross_handle_g, nose_m)
+        cross_handle.position.set(0, 0, 0.55)
+        cross_center.add(cross_handle)
+
+        propeller_anchor = new THREE.Object3D()
+
+        const wing_vg = new THREE.BoxGeometry(0.25, 0.8, 0.05)
+        const wing_hg = new THREE.BoxGeometry(0.8, 0.25, 0.05)
+        const wing_1 = new THREE.Mesh(wing_vg, hair_m)
+        const wing_2 = new THREE.Mesh(wing_hg, hair_m)
+        const wing_3 = new THREE.Mesh(wing_vg, hair_m)
+        const wing_4 = new THREE.Mesh(wing_hg, hair_m)
+        wing_1.position.set(0, 0.7, 0)
+        wing_2.position.set(0.7, 0, 0)
+        wing_3.position.set(0, -0.7, 0)
+        wing_4.position.set(-0.7, 0, 0)
+
+        propeller_anchor.add(wing_1)
+        propeller_anchor.add(wing_2)
+        propeller_anchor.add(wing_3)
+        propeller_anchor.add(wing_4)
+        cross_center.add(propeller_anchor)
+        cross_center.position.set(0, 0, 10)
+        cross_anchor.add(cross_center)
+    }
+    cross_anchor.position.set(0, 2, 0)
+    scene.add(cross_anchor)
 
     // lights
     const dirLight1 = new THREE.DirectionalLight(0xffffff);
@@ -172,15 +239,46 @@ function start() {
 
     //window resize 대응
     window.addEventListener('resize', onWindowResize, false);
+    document.addEventListener("mousedown", mouseDown);
+    document.addEventListener("mouseup", mouseUp);
+
+    document.addEventListener("mousemove", function (event) { mouseMove(event); });
+
 }
 //update
 function update() {
-    requestAnimationFrame(update);
-    const speed = 1
+    const timer = requestAnimationFrame(update);
+    // controls.update();
 
-    // leg_anchor_l.rotation.z += speed * Math.PI / 180
-    // body.rotation.y += speed * Math.PI / 180
-    controls.update();
+
+    // animation
+    if (blowing) {
+        for (let i = 0; i < hair_list.length; i++) {
+            hair_list[i].position.z = Math.cos(timer * 0.4 + i) * 0.05
+        }
+
+        for (let i = 0; i < beard_list_r.length; i++) {
+            beard_list_r[i].rotation.y = Math.cos(timer * 0.4 + i) * 0.25 + 0.25
+            beard_list_l[i].rotation.y = Math.cos(timer * 0.4 + i) * 0.25 - 0.25
+        }
+
+        ear_r.rotation.x = (Math.cos(timer * 0.5) - 0.5) * 0.1
+        ear_l.rotation.x = (Math.sin(timer * 0.5) - 0.5) * 0.1
+    }
+    else {
+        for (let i = 0; i < hair_list.length; i++) {
+            hair_list[i].position.z = 0
+        }
+        for (let i = 0; i < beard_list_r.length; i++) {
+            beard_list_r[i].rotation.y = 0
+            beard_list_l[i].rotation.y = 0
+        }
+    }
+    //propeller blowing
+    const targetSpeed = blowing ? 20 : 0;
+    currentspeed = lerp(currentspeed, targetSpeed, 0.05)
+    propeller_anchor.rotation.z += currentspeed * Math.PI / 180
+
     renderer.render(scene, camera);
 };
 
@@ -188,4 +286,24 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function mouseDown() {
+    blowing = true
+}
+
+function mouseUp() {
+    blowing = false
+}
+
+function mouseMove(event) {
+    const x = event.clientX * 2 / window.innerWidth - 1; //-1 ~1
+    const y = event.clientY * 2 / window.innerHeight - 1; //-1 ~1
+
+    cross_anchor.rotation.y = x
+    cross_anchor.rotation.x = y
+}
+
+function lerp(start, end, amt) {
+    return (1 - amt) * start + amt * end
 }
