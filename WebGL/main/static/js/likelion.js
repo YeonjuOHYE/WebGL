@@ -7,7 +7,8 @@ let body
 let leg_anchor_l;
 let leg_anchor_r;
 let hair_list;
-let beard_list;
+let beard_list_r, beard_list_l
+
 
 start();
 update();
@@ -122,12 +123,32 @@ function start() {
         mouth.position.set(0, -0.8, 1.1)
         face.add(mouth)
 
-        //beard
-        // const beard_g = new THREE.BoxGeometry(0.25, 0.25, 0.1)
-        // beard_list = []
-        // const mouth = new THREE.Mesh(mouth_g, mouth_m)
-        // mouth.position.set(0, -0.8, 1.1)
-        // face.add(mouth)
+        //left beard
+        const beard_g = new THREE.BoxGeometry(0.8, 0.04, 0.04)
+        beard_list_r = []
+        beard_list_l = []
+        for (let i = 0; i < 3; i++) {
+            const beard_anchor_r = new THREE.Object3D();
+            const beard_r = new THREE.Mesh(beard_g, nose_m)
+            beard_r.position.set(-0.4, 0, 0)
+            beard_list_r.push(beard_r)
+            beard_anchor_r.add(beard_r)
+            beard_anchor_r.position.set(-0.75 - i % 2 * 0.15, -0.17 * (i + 1), 1.05)
+            face.add(beard_anchor_r)
+
+            const beard_anchor_l = new THREE.Object3D();
+            const beard_l = new THREE.Mesh(beard_g, nose_m)
+            beard_l.position.set(0.4, 0, 0)
+            beard_list_l.push(beard_l)
+            beard_anchor_l.add(beard_l)
+            beard_anchor_l.position.set(0.75 + i % 2 * 0.15, -0.17 * (i + 1), 1.05)
+            face.add(beard_anchor_l)
+        }
+
+        //dot
+        // const dot_g = new THREE.BoxGeometry((2.1, 2.1, 2.1)
+
+
 
         face_anchor.add(face)
         head_anchor.add(face_anchor)
