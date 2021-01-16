@@ -6,11 +6,20 @@ let lion
 let body, ear_r, ear_l, eye, pupil_l, pupil_r;
 let leg_anchor_l, leg_anchor_r;
 let hair_list, beard_list_r, beard_list_l;
-
+let head_anchor
 let cross_anchor, propeller_anchor;
 
 let blowing = false
 let currentspeed = 0
+
+let eye_pos = [new THREE.Vector3(0, 0.64, -0.3), new THREE.Vector3(0, 0.72, -0.3)];
+let eye_scale = [new THREE.Vector3(2.25, 0.8, 0.8), new THREE.Vector3(2.25, 0.07, 0.8)];
+let pupil_l_pos = [new THREE.Vector3(1, 0.64, -0.3), new THREE.Vector3(1, 0.6, -0.3)];
+let pupil_l_scale = [new THREE.Vector3(0.3, 0.25, 0.25), new THREE.Vector3(0.3, 0.05, 0.8)];
+let pupil_r_pos = [new THREE.Vector3(-1, 0.64, -0.3), new THREE.Vector3(-1, 0.6, -0.3)];
+let pupil_r_scale = [new THREE.Vector3(0.3, 0.25, 0.25), new THREE.Vector3(0.3, 0.05, 0.8)];
+
+let mouse_x, mouse_y;
 start();
 update();
 
@@ -27,7 +36,7 @@ function start() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("threejs_canvas").appendChild(renderer.domElement);
 
-    camera.position.set(0, 7, 25);
+    camera.position.set(0, 7, 20);
     camera.lookAt(0, 0, 0);
 
     //set camera for mouse rotation
@@ -83,7 +92,7 @@ function start() {
         lion.add(leg_anchor_l)
         lion.add(leg_anchor_r)
 
-        const head_anchor = new THREE.Object3D();
+        head_anchor = new THREE.Object3D();
         //hair
         const hair_g = new THREE.BoxGeometry(1, 1, 0.3)
         hair_list = []
@@ -171,14 +180,19 @@ function start() {
         face.add(ear_l)
 
         //eye & pupil
-        const eye_g = new THREE.BoxGeometry(2.25, 0.8, 0.8)
-        const pupil_g = new THREE.BoxGeometry(0.3, 0.25, 0.25)
+        const eye_g = new THREE.BoxGeometry(1, 1, 1)
+        const pupil_g = new THREE.BoxGeometry(1, 1, 1)
         eye = new THREE.Mesh(eye_g, eye_m)
         pupil_l = new THREE.Mesh(pupil_g, nose_m)
         pupil_r = new THREE.Mesh(pupil_g, nose_m)
-        eye.position.set(0, 0.64, -0.3)
-        pupil_l.position.set(1, 0.64, -0.3)
-        pupil_r.position.set(-1, 0.64, -0.3)
+        eye.position.copy(eye_pos[0])
+        eye.scale.copy(eye_scale[0])
+
+        pupil_l.position.copy(pupil_l_pos[0])
+        pupil_r.position.copy(pupil_r_pos[0])
+        pupil_l.scale.copy(pupil_l_scale[0])
+        pupil_r.scale.copy(pupil_r_scale[0])
+
         face.add(eye)
         face.add(pupil_l)
         face.add(pupil_r)
@@ -187,7 +201,7 @@ function start() {
         head_anchor.add(face_anchor)
     }
     lion.position.set(0, -1, 0)
-    lion.rotation.set(0.3, 0.3, 0)
+    // lion.rotation.set(0.3, 0.3, 0)
     scene.add(lion)
 
     //make crosshair
@@ -248,22 +262,34 @@ function start() {
 //update
 function update() {
     const timer = requestAnimationFrame(update);
-    // controls.update();
 
+    //headpose
+    var propeller = new THREE.Vector3(); // create once an reuse it
+    propeller_anchor.getWorldPosition(propeller)
+    head_anchor.lookAt(propeller)
 
     // animation
     if (blowing) {
+        //hair
         for (let i = 0; i < hair_list.length; i++) {
             hair_list[i].position.z = Math.cos(timer * 0.4 + i) * 0.05
         }
-
+        //beard
         for (let i = 0; i < beard_list_r.length; i++) {
             beard_list_r[i].rotation.y = Math.cos(timer * 0.4 + i) * 0.25 + 0.25
             beard_list_l[i].rotation.y = Math.cos(timer * 0.4 + i) * 0.25 - 0.25
         }
-
+        //ear
         ear_r.rotation.x = (Math.cos(timer * 0.5) - 0.5) * 0.1
         ear_l.rotation.x = (Math.sin(timer * 0.5) - 0.5) * 0.1
+        //eye
+        eye.position.lerp(eye_pos[1], 0.05)
+        eye.scale.lerp(eye_scale[1], 0.05)
+        pupil_l.position.lerp(pupil_l_pos[1], 0.2)
+        pupil_l.scale.lerp(pupil_l_scale[1], 0.05)
+        pupil_r.position.lerp(pupil_r_pos[1], 0.2)
+        pupil_r.scale.lerp(pupil_r_scale[1], 0.05)
+
     }
     else {
         for (let i = 0; i < hair_list.length; i++) {
@@ -273,6 +299,12 @@ function update() {
             beard_list_r[i].rotation.y = 0
             beard_list_l[i].rotation.y = 0
         }
+        eye.position.lerp(eye_pos[0], 0.05)
+        eye.scale.lerp(eye_scale[0], 0.05)
+        pupil_l.position.lerp(pupil_l_pos[0], 0.2)
+        pupil_l.scale.lerp(pupil_l_scale[0], 0.05)
+        pupil_r.position.lerp(pupil_r_pos[0], 0.2)
+        pupil_r.scale.lerp(pupil_r_scale[0], 0.05)
     }
     //propeller blowing
     const targetSpeed = blowing ? 20 : 0;
@@ -297,11 +329,22 @@ function mouseUp() {
 }
 
 function mouseMove(event) {
-    const x = event.clientX * 2 / window.innerWidth - 1; //-1 ~1
-    const y = event.clientY * 2 / window.innerHeight - 1; //-1 ~1
+    mouse_x = event.clientX * 2 / window.innerWidth - 1; //-1 ~1
+    mouse_y = event.clientY * 2 / window.innerHeight - 1; //-1 ~1
 
-    cross_anchor.rotation.y = x
-    cross_anchor.rotation.x = y
+    const pupil_z_l = -mouse_x * 0.55 / 2 - 0.3// -1 1 to -0.575 -0.025 
+    const pupil_z_r = mouse_x * 0.55 / 2 - 0.3
+    const pupil_y = -mouse_y * 0.55 / 2 + 0.64// -1 1 to 0.365 0.915
+    //pupil
+    pupil_l_pos[0] = new THREE.Vector3(1, pupil_y, pupil_z_l)
+    pupil_r_pos[0] = new THREE.Vector3(-1, pupil_y, pupil_z_r)
+
+    //cross_anchor
+    cross_anchor.rotation.y = mouse_x
+    cross_anchor.rotation.x = mouse_y
+
+    leg_anchor_l.rotation.z = (-15 + mouse_x * 25) * Math.PI / 180
+    leg_anchor_r.rotation.z = (15 + mouse_x * 25) * Math.PI / 180
 }
 
 function lerp(start, end, amt) {
