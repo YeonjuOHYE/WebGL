@@ -90,6 +90,7 @@ async function main() {
   const response = await fetch("/static/obj/charS.obj");
   const text = await response.text();
   var vertices = parseOBJ(text).position.map((v) => v * 100);
+  var normals = parseOBJ(text).normal;
 
   var canvas = document.querySelector("#canvas");
   var gl = canvas.getContext("webgl");
@@ -105,10 +106,16 @@ async function main() {
 
   // look up where the vertex data needs to go.
   var positionLocation = gl.getAttribLocation(program, "a_position");
+  var normalLocation = gl.getAttribLocation(program, "a_normal");
   var colorLocation = gl.getAttribLocation(program, "a_color");
+  
 
   // lookup uniforms
   var matrixLocation = gl.getUniformLocation(program, "u_matrix");
+  var worldInverseTransposeLocation = gl.getUniformLocation(program, "u_worldInverseTranspose");
+  //reverseLightDirectionLocation
+  var reverseLightDirectionLocation = gl.getUniformLocation(program, "u_reverseLightDirection");
+  
 
   // Create a buffer to put positions in
   var positionBuffer = gl.createBuffer();
@@ -116,6 +123,10 @@ async function main() {
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   // Put geometry data into buffer
   setGeometry(gl, vertices);
+
+  var normalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  setGeometry(gl, normals);
 
   // Create a buffer to put colors in
   var colorBuffer = gl.createBuffer();
@@ -132,8 +143,9 @@ async function main() {
     return (d * Math.PI) / 180;
   }
 
-  var translation = [45, 150, 0];
-  var rotation = [degToRad(40), degToRad(25), degToRad(325)];
+  console.log(gl.canvas.width/2);
+  var translation = [gl.canvas.clientWidth/2, gl.canvas.clientHeight/2, 0];
+  var rotation = [degToRad(180), degToRad(35), degToRad(0)];
   var scale = [1, 1, 1];
 
   drawScene();
@@ -258,6 +270,19 @@ async function main() {
       offset
     );
 
+    gl.enableVertexAttribArray(normalLocation);
+
+    // Bind the position buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.vertexAttribPointer(
+      normalLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    );
+
     // Turn on the color attribute
     gl.enableVertexAttribArray(colorLocation);
 
@@ -280,24 +305,30 @@ async function main() {
     );
 
     // Compute the matrices
-    var matrix = m4.projection(
+    var matrix = matrix4.projection(
       gl.canvas.clientWidth,
       gl.canvas.clientHeight,
       400
     );
-    matrix = m4.translate(
+    matrix = matrix4.translate(
       matrix,
       translation[0],
       translation[1],
       translation[2]
     );
-    matrix = m4.xRotate(matrix, rotation[0]);
-    matrix = m4.yRotate(matrix, rotation[1]);
-    matrix = m4.zRotate(matrix, rotation[2]);
-    matrix = m4.scale(matrix, scale[0], scale[1], scale[2]);
+    matrix = matrix4.xRotate(matrix, rotation[0]);
+    matrix = matrix4.yRotate(matrix, rotation[1]);
+    matrix = matrix4.zRotate(matrix, rotation[2]);
+    matrix = matrix4.scale(matrix, scale[0], scale[1], scale[2]);
+
+    var worldInverseMatrix = m4.inverse(matrix);
+    var worldInverseTransposeMatrix = m4.transpose(worldInverseMatrix);
 
     // Set the matrix.
     gl.uniformMatrix4fv(matrixLocation, false, matrix);
+    //worldInverseTransposeLocation
+    gl.uniformMatrix4fv(worldInverseTransposeLocation, false, worldInverseTransposeMatrix);
+    gl.uniform3fv(reverseLightDirectionLocation, m4.normalize([0.4, 0.6, -0.7]));
 
     // Draw the geometry.
     var primitiveType = gl.TRIANGLES;
@@ -307,7 +338,7 @@ async function main() {
   }
 }
 
-var m4 = {
+var matrix4 = {
   projection: function (width, height, depth) {
     // Note: This matrix flips the Y axis so 0 is at the top.
     return [
@@ -413,23 +444,23 @@ var m4 = {
   },
 
   translate: function (m, tx, ty, tz) {
-    return m4.multiply(m, m4.translation(tx, ty, tz));
+    return matrix4.multiply(m, matrix4.translation(tx, ty, tz));
   },
 
   xRotate: function (m, angleInRadians) {
-    return m4.multiply(m, m4.xRotation(angleInRadians));
+    return matrix4.multiply(m, matrix4.xRotation(angleInRadians));
   },
 
   yRotate: function (m, angleInRadians) {
-    return m4.multiply(m, m4.yRotation(angleInRadians));
+    return matrix4.multiply(m, matrix4.yRotation(angleInRadians));
   },
 
   zRotate: function (m, angleInRadians) {
-    return m4.multiply(m, m4.zRotation(angleInRadians));
+    return matrix4.multiply(m, matrix4.zRotation(angleInRadians));
   },
 
   scale: function (m, sx, sy, sz) {
-    return m4.multiply(m, m4.scaling(sx, sy, sz));
+    return matrix4.multiply(m, matrix4.scaling(sx, sy, sz));
   },
 };
 
