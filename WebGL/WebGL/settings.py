@@ -127,3 +127,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 MEDIA_URL = "/media/"
 
+#settings.py
+if DEBUG:
+    import mimetypes
+    mimetypes.add_type("application/javascript", ".js", True)
