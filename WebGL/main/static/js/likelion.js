@@ -1,4 +1,5 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
+import { GUI } from '../jsm/gui/dat.gui.module.js';
 
 let scene, renderer, camera, controls
 
@@ -7,6 +8,9 @@ let body, ear_r, ear_l, eye, pupil_l, pupil_r;
 let leg_anchor_l, leg_anchor_r;
 let hair_list, beard_list_r, beard_list_l;
 let head_anchor
+let hair_anchor
+let face_anchor
+let face
 let cross_anchor, propeller_anchor;
 
 let blowing = false
@@ -19,7 +23,7 @@ let pupil_l_scale = [new THREE.Vector3(0.3, 0.25, 0.25), new THREE.Vector3(0.3, 
 let pupil_r_pos = [new THREE.Vector3(-1, 0.64, -0.3), new THREE.Vector3(-1, 0.6, -0.3)];
 let pupil_r_scale = [new THREE.Vector3(0.3, 0.25, 0.25), new THREE.Vector3(0.3, 0.05, 0.8)];
 
-let mouse_x, mouse_y;
+let mouse_x = 0, mouse_y = 0;
 start();
 update();
 
@@ -43,10 +47,14 @@ function start() {
     // controls = new OrbitControls(camera, renderer.domElement)
 
     const body_m = new THREE.MeshPhongMaterial({ color: 0xffd377 });
+    const body_m2 = new THREE.MeshBasicMaterial({ color: 0xffe785 });
     const hair_m = new THREE.MeshPhongMaterial({ color: 0xff553e });
     const eye_m = new THREE.MeshPhongMaterial({ color: 0xffffff });
     const nose_m = new THREE.MeshPhongMaterial({ color: 0xb07388 });
     const mouth_m = new THREE.MeshPhongMaterial({ color: 0x000000 });
+
+
+
     //make lion
     {
         lion = new THREE.Object3D();
@@ -70,7 +78,7 @@ function start() {
 
         //body
         const body_g = new THREE.ConeGeometry(2.5, 4, 3);
-        body = new THREE.Mesh(body_g, body_m);
+        body = new THREE.Mesh(body_g, body_m2);
         body.position.set(0, 2, -1)
         body.scale.z = 0.3
         lion.add(body)
@@ -96,7 +104,7 @@ function start() {
         //hair
         const hair_g = new THREE.BoxGeometry(1, 1, 0.3)
         hair_list = []
-        const hair_anchor = new THREE.Object3D();
+        hair_anchor = new THREE.Object3D();
         for (let i = 0; i < 16; i++) {
             const hair = new THREE.Mesh(hair_g, hair_m)
             const quotient = (i - i % 4) / 4;
@@ -111,8 +119,8 @@ function start() {
 
         //face
         const face_g = new THREE.BoxGeometry(2.1, 2.1, 2.1)
-        const face_anchor = new THREE.Object3D();
-        const face = new THREE.Mesh(face_g, body_m)
+        face_anchor = new THREE.Object3D();
+        face = new THREE.Mesh(face_g, body_m)
         face.position.set(0, 0, 1.05)
 
         //nose
@@ -199,6 +207,7 @@ function start() {
 
         face_anchor.add(face)
         head_anchor.add(face_anchor)
+
     }
     lion.position.set(0, -1, 0)
     // lion.rotation.set(0.3, 0.3, 0)
@@ -241,14 +250,10 @@ function start() {
 
     // lights
     const dirLight1 = new THREE.DirectionalLight(0xffffff);
-    dirLight1.position.set(1, 1, 1);
+    dirLight1.position.set(0, 1, 1);
     scene.add(dirLight1);
 
-    const dirLight2 = new THREE.DirectionalLight(0xffffff);
-    dirLight2.position.set(- 1, - 1, - 1);
-    scene.add(dirLight2);
-
-    const ambientLight = new THREE.AmbientLight(0x222222);
+    const ambientLight = new THREE.AmbientLight(0x8c8c8c);
     scene.add(ambientLight);
 
     //window resize 대응
@@ -257,6 +262,29 @@ function start() {
     document.addEventListener("mouseup", mouseUp);
 
     document.addEventListener("mousemove", function (event) { mouseMove(event); });
+    //attach gui
+    class FogGUIHelper {
+        constructor(ambientLight, dirLight) {
+            this.ambientLight = ambientLight;
+            this.dirLight = dirLight;
+        }
+        get ambientcolor() {
+            return `#${this.ambientLight.getHexString()}`;
+        }
+        set ambientcolor(hexString) {
+            this.ambientLight.set(hexString);
+        }
+        get directioncolor() {
+            return `#${this.dirLight.getHexString()}`;
+        }
+        set directioncolor(hexString) {
+            this.dirLight.set(hexString);
+        }
+    }
+    const gui = new GUI()
+    const fogGUIHelper = new FogGUIHelper(ambientLight.color, dirLight1.color)
+    gui.addColor(fogGUIHelper, 'ambientcolor')
+    gui.addColor(fogGUIHelper, 'directioncolor')
 
 }
 //update
@@ -267,12 +295,12 @@ function update() {
     var propeller = new THREE.Vector3(); // create once an reuse it
     propeller_anchor.getWorldPosition(propeller)
     head_anchor.lookAt(propeller)
-
+    head_anchor.rotation.z += mouse_x * mouse_y * 45 * Math.PI / 180
     // animation
     if (blowing) {
         //hair
         for (let i = 0; i < hair_list.length; i++) {
-            hair_list[i].position.z = Math.cos(timer * 0.4 + i) * 0.05
+            hair_list[i].position.z = Math.cos(timer * 0.4 + i) * 0.2
         }
         //beard
         for (let i = 0; i < beard_list_r.length; i++) {
@@ -290,6 +318,17 @@ function update() {
         pupil_r.position.lerp(pupil_r_pos[1], 0.2)
         pupil_r.scale.lerp(pupil_r_scale[1], 0.05)
 
+        head_anchor.position.lerp(new THREE.Vector3(0, 4, 1), 0.1)
+        head_anchor.scale.lerp(new THREE.Vector3(1.1, 1.1, 1.1), 0.1)
+        hair_anchor.rotation.y = lerp(hair_anchor.rotation.y, mouse_x * -70 * Math.PI / 180, 0.1)
+        hair_anchor.rotation.x = lerp(hair_anchor.rotation.x, mouse_y * -90 * Math.PI / 180, 0.1)
+        face.position.z = lerp(face.position.z, 1.5, 0.1)
+        face_anchor.rotation.x = lerp(face_anchor.rotation.x, mouse_y * -120 * Math.PI / 180, 0.1)
+        face_anchor.rotation.y = lerp(face_anchor.rotation.y, mouse_x * -120 * Math.PI / 180, 0.1)
+
+
+        leg_anchor_l.rotation.z = lerp(leg_anchor_l.rotation.z, (-15 + mouse_x * -30) * Math.PI / 180, 0.1)
+        leg_anchor_r.rotation.z = lerp(leg_anchor_r.rotation.z, (15 + mouse_x * -30) * Math.PI / 180, 0.1)
     }
     else {
         for (let i = 0; i < hair_list.length; i++) {
@@ -305,7 +344,18 @@ function update() {
         pupil_l.scale.lerp(pupil_l_scale[0], 0.05)
         pupil_r.position.lerp(pupil_r_pos[0], 0.2)
         pupil_r.scale.lerp(pupil_r_scale[0], 0.05)
+
+        head_anchor.position.lerp(new THREE.Vector3(0, 3.5, 0), 0.1)
+        head_anchor.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1)
+        hair_anchor.rotation.y = lerp(hair_anchor.rotation.y, 0, 0.1)
+        hair_anchor.rotation.x = lerp(hair_anchor.rotation.x, 0, 0.1)
+        face.position.z = lerp(face.position.z, 1.05, 0.1)
+        face_anchor.rotation.y = lerp(face_anchor.rotation.y, 0, 0.1)
+        face_anchor.rotation.x = lerp(face_anchor.rotation.x, 0, 0.1)
+        leg_anchor_l.rotation.z = lerp(leg_anchor_l.rotation.z, (-15 + mouse_x * 30) * Math.PI / 180, 0.3)
+        leg_anchor_r.rotation.z = lerp(leg_anchor_r.rotation.z, (15 + mouse_x * 30) * Math.PI / 180, 0.3)
     }
+
     //propeller blowing
     const targetSpeed = blowing ? 20 : 0;
     currentspeed = lerp(currentspeed, targetSpeed, 0.05)
@@ -343,8 +393,6 @@ function mouseMove(event) {
     cross_anchor.rotation.y = mouse_x
     cross_anchor.rotation.x = mouse_y
 
-    leg_anchor_l.rotation.z = (-15 + mouse_x * 25) * Math.PI / 180
-    leg_anchor_r.rotation.z = (15 + mouse_x * 25) * Math.PI / 180
 }
 
 function lerp(start, end, amt) {
