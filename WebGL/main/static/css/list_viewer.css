@@ -1,0 +1,44 @@
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#description {
+  left:50%;
+  position:absolute;
+  color:#808080;
+  font-size: 1.3em;
+  display: inline-block;
+}
+.title{
+  font-size: 7em;
+  font-family: 'Teko', sans-serif;
+  color:#ffffff;
+  display: inline-block;
+  vertical-align: top;
+  letter-spacing: -0.05em;
+}
+.index{
+  font-size: 1em;
+  font-family: 'Sacramento', cursive;
+  color: #ffffff;
+  display: inline-block;
+  vertical-align: top;
+  font-weight: bold;
+  margin-top : 2.2em;
+  margin-left : 0.5em;
+  
+}
+.item{
+  margin-bottom: -4em;
+}
+
+#threejs_canvas{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}

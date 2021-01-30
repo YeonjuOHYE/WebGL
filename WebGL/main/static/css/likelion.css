@@ -1,0 +1,16 @@
+#description {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  color:#808080;
+  font-size: 1.3em;
+  padding: 3%;
+  font-weight: bold;
+}
+#span_title{
+  font-size: 3em;
+  color:#806060;
+}
+#ref_link{
+  color: green
+}

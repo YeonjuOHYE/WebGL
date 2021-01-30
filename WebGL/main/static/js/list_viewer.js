@@ -31,8 +31,7 @@ function start() {
     scene = new THREE.Scene();
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-    scene.background = new THREE.Color(0xebe5e7);
-    scene.fog = new THREE.FogExp2(0x000000, 0.002);
+    scene.background = new THREE.Color(0x202020);
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);

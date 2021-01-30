@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
 
 {% load static %}
+
 {% block title %}
 <script type="module" src="{% static 'js/likelion.js'%}"></script>
+<link rel="stylesheet" href="{% static 'css/likelion.css'%}" type="text/css">
+</script>
 {% endblock %}
 
 {% block body %}
+<div id="description">
+    <span id="span_title">note</span>
+    </p>This example is made with considerable reference to
+    <a id="ref_link" href="https://moments.epic.net/">this site</a>.<br>
+    I just imitated the site for the purpose of studying GL, <br>
+    I brought the design and ideas from the website above. <br>
+    Please visit the website for more experience.<p>
+</div>
 {% endblock %}
