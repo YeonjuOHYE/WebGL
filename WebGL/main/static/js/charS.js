@@ -16,15 +16,6 @@ function parseOBJ(text) {
     [], // normals
   ];
 
-  function newGeometry() {
-    // If there is an existing geometry and it's
-    // not empty then start a new one.
-    if (geometry && geometry.data.position.length) {
-      geometry = undefined;
-    }
-    setGeometry();
-  }
-
   function addVertex(vert) {
     const ptn = vert.split("/");
     ptn.forEach((objIndexStr, i) => {
@@ -87,10 +78,13 @@ function parseOBJ(text) {
 }
 
 async function main() {
-  const response = await fetch("/static/obj/charS.obj");
+  const response = await fetch("/static/obj/withTexture.obj");
   const text = await response.text();
+
   var vertices = parseOBJ(text).position.map((v) => v * 100);
   var normals = parseOBJ(text).normal;
+  var texcoords = parseOBJ(text).texcoord;
+
 
   var canvas = document.querySelector("#canvas");
   var gl = canvas.getContext("webgl");
@@ -107,15 +101,17 @@ async function main() {
   // look up where the vertex data needs to go.
   var positionLocation = gl.getAttribLocation(program, "a_position");
   var normalLocation = gl.getAttribLocation(program, "a_normal");
-  var colorLocation = gl.getAttribLocation(program, "a_color");
-  
+  //var colorLocation = gl.getAttribLocation(program, "a_color");
+  var texcoordLocation = gl.getAttribLocation(program, "a_texcoord");
 
   // lookup uniforms
   var matrixLocation = gl.getUniformLocation(program, "u_matrix");
+  var textureLocation = gl.getUniformLocation(program, "u_texture");
+
   var worldInverseTransposeLocation = gl.getUniformLocation(program, "u_worldInverseTranspose");
   //reverseLightDirectionLocation
   var reverseLightDirectionLocation = gl.getUniformLocation(program, "u_reverseLightDirection");
-  
+
 
   // Create a buffer to put positions in
   var positionBuffer = gl.createBuffer();
@@ -129,11 +125,50 @@ async function main() {
   setGeometry(gl, normals);
 
   // Create a buffer to put colors in
-  var colorBuffer = gl.createBuffer();
+  //var colorBuffer = gl.createBuffer();
   // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = colorBuffer)
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  //gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
   // Put geometry data into buffer
-  setColors(gl, vertices);
+  // setColors(gl, vertices);
+
+  // provide texture coordinates for the rectangle.
+  var texcoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+  // Set Texcoords.
+  setTexcoords(gl, texcoords);
+
+  // Create a texture.
+  var texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  // Fill the texture with a 1x1 blue pixel.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+    new Uint8Array([0, 0, 255, 255]));
+  // Asynchronously load an image
+  var image = new Image();
+  image.src = "/static/img/texture.png";
+  image.addEventListener('load', function () {
+
+    // Now that the image has loaded make copy it to the texture.
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    // Check if the image is a power of 2 in both dimensions.
+    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+      // Yes, it's a power of 2. Generate mips.
+      gl.generateMipmap(gl.TEXTURE_2D);
+    } else {
+      // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
+
+    drawScene();
+
+  });
+
+  function isPowerOf2(value) {
+    return (value & (value - 1)) === 0;
+  }
 
   function radToDeg(r) {
     return (r * 180) / Math.PI;
@@ -143,8 +178,7 @@ async function main() {
     return (d * Math.PI) / 180;
   }
 
-  console.log(gl.canvas.width/2);
-  var translation = [gl.canvas.clientWidth/2, gl.canvas.clientHeight/2, 0];
+  var translation = [gl.canvas.clientWidth / 2, gl.canvas.clientHeight / 2, 0];
   var rotation = [degToRad(180), degToRad(35), degToRad(0)];
   var scale = [1, 1, 1];
 
@@ -283,26 +317,20 @@ async function main() {
       offset
     );
 
-    // Turn on the color attribute
-    gl.enableVertexAttribArray(colorLocation);
+    gl.enableVertexAttribArray(texcoordLocation);
+    // bind the texcoord buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
 
-    // Bind the color buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-
-    // Tell the attribute how to get data out of colorBuffer (ARRAY_BUFFER)
-    var size = 3; // 3 components per iteration
-    var type = gl.UNSIGNED_BYTE; // the data is 8bit unsigned values
-    var normalize = true; // normalize the data (convert from 0-255 to 0-1)
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
+    // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
+    var size = 2;          // 2 components per iteration
+    var type = gl.FLOAT;   // the data is 32bit floats
+    var normalize = false; // don't normalize the data
+    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+    var offset = 0;        // start at the beginning of the buffer
     gl.vertexAttribPointer(
-      colorLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset
-    );
+      texcoordLocation, size, type, normalize, stride, offset);
+    gl.uniform1i(textureLocation, 0);
+
 
     // Compute the matrices
     var matrix = matrix4.projection(
@@ -333,7 +361,7 @@ async function main() {
     // Draw the geometry.
     var primitiveType = gl.TRIANGLES;
     var offset = 0;
-    var count = 4356 / 3;
+    var count = 21744 / 3;
     gl.drawArrays(primitiveType, offset, count);
   }
 }
@@ -466,22 +494,22 @@ var matrix4 = {
 
 // Fill the buffer with the values that define a letter 'F'.
 function setGeometry(gl, vertices) {
-  //console.log(vertices);
+  console.log(vertices);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 }
 
-// Fill the buffer with colors for the 'F'.
-function setColors(gl, vertices) {
-  var colors = vertices?.map((v, index) => {
-    if (index % 3 === 0) {
-      return 200;
-    } else if (index % 3 === 1) {
-      return 70;
-    } else {
-      return 120;
-    }
-  });
-  gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(colors), gl.STATIC_DRAW);
+
+// Fill the current ARRAY_BUFFER buffer
+// with texture coordinates for the letter 'F'.
+function setTexcoords(gl, textcoords) {
+  console.log(textcoords);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(textcoords),
+    gl.STATIC_DRAW);
 }
+
+
+
 
 main();

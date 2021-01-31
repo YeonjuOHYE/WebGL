@@ -21,6 +21,7 @@
   attribute vec4 a_position;
   attribute vec4 a_color;
   attribute vec3 a_normal;
+  attribute vec2 a_texcoord;
 
   uniform mat4 u_matrix;
 
@@ -29,14 +30,18 @@
   uniform mat4 u_worldInverseTranspose;
 
   varying vec3 v_normal;
+  varying vec2 v_texcoord;
 
   void main() {
     // Multiply the position by the matrix.
     gl_Position = u_matrix * a_position;
 
     // Pass the color to the fragment shader.
-    v_color = a_color;
+    //v_color = a_color;
     v_normal = mat3(u_matrix) * a_normal;
+
+    // Pass the texcoord to the fragment shader.
+    v_texcoord = a_texcoord;
   }
 </script>
 <!-- fragment shader -->
@@ -44,22 +49,30 @@
   precision mediump float;
 
   // Passed in from the vertex shader.
-  varying vec4 v_color;
+  //varying vec4 v_color;
 
   varying vec3 v_normal;
 
   uniform vec3 u_reverseLightDirection;
+
+  // Passed in from the vertex shader.
+  varying vec2 v_texcoord;
+  
+  // The texture.
+  uniform sampler2D u_texture;
 
   void main() {
     vec3 normal = normalize(v_normal);
 
     float light = dot(normal, u_reverseLightDirection);
   
-    gl_FragColor = v_color;
+    //gl_FragColor = v_color;
+    gl_FragColor = texture2D(u_texture, v_texcoord);
   
     // Lets multiply just the color portion (not the alpha)
     // by the light
     gl_FragColor.rgb *= light;
+
   }
 </script>
 <!--
@@ -72,10 +85,7 @@ for webgl-utils, m3, m4, and webgl-lessons-ui.
 <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
 <script src="https://webglfundamentals.org/webgl/resources/webgl-lessons-ui.js"></script>
 <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
-<script
-  src="https://code.jquery.com/jquery-3.5.1.js"
-  integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
-  crossorigin="anonymous"
-></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+  crossorigin="anonymous"></script>
 <script src="/static/js/charS.js"></script>
 {% endblock %}
