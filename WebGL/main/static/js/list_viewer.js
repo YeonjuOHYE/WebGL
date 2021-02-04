@@ -28,19 +28,24 @@ function start() {
     //add waving plane
     const textureWidth = 320
     const textureHeight = 240
-    const dessertNum = 5;
-    const meshDivide = 32;
-
+    const rightMargin = 70
+    const dessertNum = 10;
+    const meshDivide = (textureWidth + rightMargin) / 10;
     const loadManager = new THREE.LoadingManager();
     const loader = new THREE.TextureLoader(loadManager);
 
-    const wave_g = new THREE.PlaneGeometry(textureWidth * dessertNum / 50, textureHeight / 50, dessertNum * meshDivide);
+    const wave_g = new THREE.PlaneGeometry((textureWidth + rightMargin) * dessertNum / 50, textureHeight / 50, dessertNum * meshDivide);
     const wave_m_list = [
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/1.jpg') }),
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/2.jpg') }),
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/3.jpg') }),
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/4.jpg') }),
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/5.jpg') }),
+        new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/6.jpg') }),
+        new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/7.jpg') }),
+        new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/8.jpg') }),
+        new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/9.jpg') }),
+        new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/10.jpg') }),
     ];
     loadManager.onLoad = () => {
         const wave = new THREE.Mesh(wave_g, wave_m_list);
@@ -49,25 +54,32 @@ function start() {
         //set vertex pos
         const halfIndex = wave.geometry.vertices.length / 2
         for (let i = 0; i < halfIndex; i++) {
-            wave.geometry.vertices[i].z = Math.sin((i / meshDivide) * 2 * Math.PI) / 2;
-            wave.geometry.vertices[i + halfIndex].z = Math.sin((i / meshDivide) * 2 * Math.PI) / 2;
+            wave.geometry.vertices[i].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
+            wave.geometry.vertices[i + halfIndex].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
         }
         //set face texture
-        const faceUnit = wave.geometry.faces.length / dessertNum;
+        const faceUvUnit = 2 * meshDivide;
+        const contentUnit = faceUvUnit * (textureWidth / (textureWidth + rightMargin))
         for (let i = 0; i < wave.geometry.faces.length; i++) {
-            wave.geometry.faces[i].materialIndex = Math.floor(i / faceUnit);
+            wave.geometry.faces[i].materialIndex = Math.floor(i / faceUvUnit);
+            //inverse face order (transparent)
+            if (i % faceUvUnit >= contentUnit) {
+                const temp = wave.geometry.faces[i].a;
+                wave.geometry.faces[i].a = wave.geometry.faces[i].b;
+                wave.geometry.faces[i].b = temp
+            }
         }
+
         //set vertex uv
-        const faceUvUnit = wave.geometry.faceVertexUvs[0].length / dessertNum;
         for (let i = 0; i < wave.geometry.faceVertexUvs[0].length; i++) {
-            const quotient = Math.floor(i / faceUvUnit)
+            const quotient = Math.floor(i / (faceUvUnit))
             const uvUnit = 1 / dessertNum;
             const v1 = wave.geometry.faceVertexUvs[0][i][0]
             const v2 = wave.geometry.faceVertexUvs[0][i][1]
             const v3 = wave.geometry.faceVertexUvs[0][i][2]
-            v1.x = dessertNum * (v1.x - quotient * uvUnit)
-            v2.x = dessertNum * (v2.x - quotient * uvUnit)
-            v3.x = dessertNum * (v3.x - quotient * uvUnit)
+            v1.x = dessertNum * (v1.x - quotient * uvUnit) * faceUvUnit / contentUnit
+            v2.x = dessertNum * (v2.x - quotient * uvUnit) * faceUvUnit / contentUnit
+            v3.x = dessertNum * (v3.x - quotient * uvUnit) * faceUvUnit / contentUnit
         }
         console.log(wave)
 
