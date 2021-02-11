@@ -1,4 +1,5 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
+import { GUI } from '../jsm/gui/dat.gui.module.js';
 let scene, renderer, camera, controls
 
 let mouse_x = 0, mouse_y = 0;
@@ -31,6 +32,8 @@ function start() {
     const rightMargin = 70
     const dessertNum = 10;
     const meshDivide = (textureWidth + rightMargin) / 10;
+
+
     const loadManager = new THREE.LoadingManager();
     const loader = new THREE.TextureLoader(loadManager);
 
@@ -47,6 +50,7 @@ function start() {
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/9.jpg') }),
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/10.jpg') }),
     ];
+
     loadManager.onLoad = () => {
         const wave = new THREE.Mesh(wave_g, wave_m_list);
         wave.rotation.set(-90 * Math.PI / 180, 0, 0);
@@ -83,6 +87,31 @@ function start() {
         }
         console.log(wave)
 
+        class DegRadHelper {
+            constructor(obj, meshDivide) {
+                this.obj = obj
+                this.position = obj.position;
+                this.meshDivide = meshDivide
+                console.log(this.obj.geometry.vertices);
+            }
+            get value() {
+                return this.position.x
+            }
+            set value(v) {
+                this.position.x = v
+                //set vertex pos
+                const halfIndex = this.obj.geometry.vertices.length / 2
+                console.log(halfIndex);
+                for (let i = 0; i < halfIndex; i++) {
+                    // this.obj.geometry.vertices[i].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
+                    // this.obj.geometry.vertices[i + halfIndex].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
+                    this.obj.geometry.vertices[i].z = 0
+                    this.obj.geometry.vertices[i + halfIndex].z = 0
+                }
+            }
+        }
+        const gui = new GUI()
+        gui.add(new DegRadHelper(wave, meshDivide), 'value', -30, 30).name('pos_x')
         scene.add(wave);
 
     }
@@ -105,7 +134,6 @@ function start() {
 //update
 function update() {
     const timer = requestAnimationFrame(update);
-
     renderer.render(scene, camera);
 };
 
