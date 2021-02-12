@@ -1,7 +1,8 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 import { GUI } from '../jsm/gui/dat.gui.module.js';
 let scene, renderer, camera, controls
-
+let mesh_plane, mesh_sphere;
+let uniforms, plane_displacement, sphere_displacement;
 start();
 update();
 
@@ -26,47 +27,60 @@ function start() {
     controls = new OrbitControls(camera, renderer.domElement)
 
     const width = 2, height = 2, division = 1;
-    const geometry = new THREE.PlaneBufferGeometry(width, height, division);
-    const geometry2 = new THREE.SphereGeometry(2, 2, 2);
-    const uniforms = {
+    const plane_g = new THREE.PlaneBufferGeometry(width, height, division);
+    const sphere_g = new THREE.SphereBufferGeometry(1, 20, 20);
+
+    //set vertex shader
+    uniforms = {
         "amplitude": { value: 1.0 },
         "color": { value: new THREE.Color(0xff22ff) },
         "colorTexture": { value: new THREE.TextureLoader().load('/media/main/vertex_shader/Lenna.png') }
     }
-    uniforms["colorTexture"].value.wrapS = THREE.RepeatWrapping;
-    uniforms["colorTexture"].value.wrapT = THREE.RepeatWrapping;
     const vShader = document.getElementById('vertexShader').innerHTML;
     const fShader = document.getElementById('fragmentShader').innerHTML;
-
     const material = new THREE.ShaderMaterial({
         uniforms: uniforms,
         vertexShader: vShader,
         fragmentShader: fShader,
     });
 
-    console.log(geometry);
-    console.log(geometry.attributes);
-    console.log(geometry2);
-    const displacement = new Float32Array(geometry.attributes.position.count);
-    const noise = new Float32Array(geometry.attributes.position.count);
+    //add vertex displacement attribute to buffergeometry
+    plane_displacement = new Float32Array(plane_g.attributes.position.count);
+    sphere_displacement = new Float32Array(sphere_g.attributes.position.count);
+    plane_g.setAttribute('displacement', new THREE.BufferAttribute(plane_displacement, 1));
+    sphere_g.setAttribute('displacement', new THREE.BufferAttribute(sphere_displacement, 1));
 
-
-    for (let i = 0; i < displacement.length; i++) {
-        noise[i] = Math.random();
-    }
-
-    geometry.setAttribute('displacement', new THREE.BufferAttribute(displacement, 1));
-
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.x = -90 * Math.PI / 180;
-    scene.add(mesh);
+    mesh_plane = new THREE.Mesh(plane_g, material);
+    mesh_sphere = new THREE.Mesh(sphere_g, material);
+    mesh_plane.rotation.x = -90 * Math.PI / 180;
+    mesh_plane.position.x = -1;
+    mesh_sphere.position.x = 1;
+    mesh_sphere.rotation.x = -90 * Math.PI / 180;
+    mesh_sphere.rotation.y = -90 * Math.PI / 180;
+    scene.add(mesh_plane);
+    scene.add(mesh_sphere);
 
     //window resize 대응
     window.addEventListener('resize', onWindowResize, false);
 }
 //update
 function update() {
-    const timer = requestAnimationFrame(update);
+    requestAnimationFrame(update);
+    const time = Date.now() * 0.01;
+
+    uniforms["amplitude"].value = 1;
+    uniforms["color"].value.offsetHSL(0.0005, 0, 0);
+
+    for (let i = 0; i < plane_displacement.length; i++) {
+        plane_displacement[i] = Math.sin(i + time) * 0.1;
+    }
+    for (let i = 0; i < sphere_displacement.length; i++) {
+        sphere_displacement[i] = Math.sin(i * 0.03 + time * 0.5) * 0.05;
+    }
+
+    mesh_plane.geometry.attributes.displacement.needsUpdate = true;
+    mesh_sphere.geometry.attributes.displacement.needsUpdate = true;
+    controls.update();
     renderer.render(scene, camera);
 };
 
