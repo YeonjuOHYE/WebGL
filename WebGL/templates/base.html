@@ -26,13 +26,15 @@
 
 <body>
     {%include 'sidebar_examples.html'%}
+
+    {% block DOM %}
+    {% endblock %}
     <div id="threejs_canvas">
         {% block body %}
         {% endblock %}
     </div>
 
-    {% block DOM %}
-    {% endblock %}
+    
 </body>
 
 </html>
