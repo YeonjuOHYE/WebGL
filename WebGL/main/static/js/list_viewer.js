@@ -1,7 +1,7 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 import { GUI } from '../jsm/gui/dat.gui.module.js';
 let scene, renderer, camera, controls
-
+let wave;
 let mouse_x = 0, mouse_y = 0;
 start();
 update();
@@ -29,13 +29,15 @@ function start() {
     //add waving plane
     const textureWidth = 320
     const textureHeight = 240
-    const rightMargin = 70
+    const rightMargin = 50
     const dessertNum = 10;
     const meshDivide = (textureWidth + rightMargin) / 10;
 
 
     const loadManager = new THREE.LoadingManager();
     const loader = new THREE.TextureLoader(loadManager);
+
+    const pos_x = (textureWidth + rightMargin) * dessertNum / 50 / 2
 
     const wave_g = new THREE.PlaneGeometry((textureWidth + rightMargin) * dessertNum / 50, textureHeight / 50, dessertNum * meshDivide);
     const wave_m_list = [
@@ -50,16 +52,16 @@ function start() {
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/9.jpg') }),
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/10.jpg') }),
     ];
-
+    wave = new THREE.Mesh(wave_g, wave_m_list);
     loadManager.onLoad = () => {
-        const wave = new THREE.Mesh(wave_g, wave_m_list);
+        // wave = new THREE.Mesh(wave_g, wave_m_list);
         wave.rotation.set(-90 * Math.PI / 180, 0, 0);
-
+        wave.position.x = pos_x;
         //set vertex pos
         const halfIndex = wave.geometry.vertices.length / 2
         for (let i = 0; i < halfIndex; i++) {
-            wave.geometry.vertices[i].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
-            wave.geometry.vertices[i + halfIndex].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
+            wave.geometry.vertices[i].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) * 2 / 3;
+            wave.geometry.vertices[i + halfIndex].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) * 2 / 3;
         }
         //set face texture
         const faceUvUnit = 2 * meshDivide;
@@ -100,17 +102,14 @@ function start() {
                 this.position.x = v
                 //set vertex pos
                 const halfIndex = this.obj.geometry.vertices.length / 2
-                console.log(halfIndex);
                 for (let i = 0; i < halfIndex; i++) {
-                    // this.obj.geometry.vertices[i].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
-                    // this.obj.geometry.vertices[i + halfIndex].z = Math.sin((i / meshDivide) * 1.5 * Math.PI) / 2;
-                    this.obj.geometry.vertices[i].z = 0
-                    this.obj.geometry.vertices[i + halfIndex].z = 0
+                    this.obj.geometry.vertices[i].z = Math.sin(((i / meshDivide) * 1.5 + v * 0.2) * Math.PI) * 2 / 3;
+                    this.obj.geometry.vertices[i + halfIndex].z = Math.sin(((i / meshDivide) * 1.5 + v * 0.2) * Math.PI) * 2 / 3;
                 }
             }
         }
         const gui = new GUI()
-        gui.add(new DegRadHelper(wave, meshDivide), 'value', -30, 30).name('pos_x')
+        gui.add(new DegRadHelper(wave, meshDivide), 'value', -pos_x, pos_x).name('pos_x')
         scene.add(wave);
 
     }
@@ -133,6 +132,8 @@ function start() {
 //update
 function update() {
     const timer = requestAnimationFrame(update);
+    wave.geometry.verticesNeedUpdate = true;
+    controls.update()
     renderer.render(scene, camera);
 };
 
