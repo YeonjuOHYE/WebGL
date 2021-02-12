@@ -37,7 +37,7 @@ function start() {
     const loadManager = new THREE.LoadingManager();
     const loader = new THREE.TextureLoader(loadManager);
 
-    const wave_g = new THREE.PlaneGeometry((textureWidth + rightMargin) * dessertNum / 50, textureHeight / 50, dessertNum * meshDivide);
+    const wave_g = new THREE.PlaneBufferGeometry((textureWidth + rightMargin) * dessertNum / 50, textureHeight / 50, dessertNum * meshDivide);
     const wave_m_list = [
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/1.jpg') }),
         new THREE.MeshPhongMaterial({ map: loader.load('/media/main/list_viewer/2.jpg') }),
