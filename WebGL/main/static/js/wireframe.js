@@ -3,104 +3,68 @@ import { LineMaterial } from '../jsm/lines/LineMaterial.js';
 import { Wireframe } from '../jsm/lines/Wireframe.js';
 import { WireframeGeometry2 } from '../jsm/lines/WireframeGeometry2.js';
 
-let wireframe, renderer, scene, camera, controls;
-let wireframe1;
-let matLine, matLineBasic, matLineDashed;
-let gui;
-
-// viewport
-let insetWidth;
-let insetHeight;
+let renderer, scene, camera, controls;
+let matLine, matLineBasic;
 
 start();
 update();
 
 function start() {
-
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setClearColor( 0x000000, 0.0 );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-
+    console.log("basic.js onload")
+    //start
     scene = new THREE.Scene();
+    renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true } );
+    camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+    scene.background = new THREE.Color(0x000000);
 
-    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
-    camera.position.set(0, 0, 300 );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.getElementById("threejs_canvas").appendChild(renderer.domElement);
+    
+    camera.position.set(0, 0, 100 );
+    camera.lookAt(0, 0, 0);
 
     controls = new OrbitControls( camera, renderer.domElement );
 
-
     // Wireframe ( WireframeGeometry2, LineMaterial )
-
-    let geo = new THREE.IcosahedronGeometry( 20, 1 );
-    const geometry = new WireframeGeometry2( geo );
-
     matLine = new LineMaterial( {
         color: 0x4080ff,
         linewidth: 4, // in pixels
     } );
-
-    wireframe = new Wireframe( geometry, matLine );
-    wireframe.computeLineDistances();
-    wireframe.scale.set( 1, 1, 1 );
-    wireframe.position.x = -25;
-    scene.add( wireframe );
-
-
+    matLine.resolution.set( window.innerWidth, window.innerHeight ); 
+    
     // Line ( THREE.WireframeGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE
+    matLineBasic = new THREE.LineBasicMaterial( { color: 0x4080ff } )
 
-    geo = new THREE.WireframeGeometry( geo );
+    //make geometries
+    let poligon_g = new THREE.IcosahedronGeometry( 20, 1 );
+    // poligon_g = new THREE.BoxGeometry(1,1,1)
+    const poligon_wg_0 = new WireframeGeometry2(poligon_g);
+    const wireframe_00 = new Wireframe(poligon_wg_0, matLine );
+    wireframe_00.computeLineDistances();
+    wireframe_00.position.x = -25;
+    scene.add( wireframe_00 );
 
-    matLineBasic = new THREE.LineBasicMaterial( { color: 0x4080ff } );
-    matLineDashed = new THREE.LineDashedMaterial( { scale: 2, dashSize: 1, gapSize: 1 } );
-
-    wireframe1 = new THREE.LineSegments( geo, matLineBasic );
-    wireframe1.computeLineDistances();
-    wireframe1.position.x = 25;
-    scene.add( wireframe1 );
+    //make geometries
+    const poligon_wg_1 = new THREE.WireframeGeometry(poligon_g);
+    const wireframe_10 = new THREE.LineSegments(poligon_wg_1, matLineBasic );
+    wireframe_10.computeLineDistances();
+    wireframe_10.position.x = 25;
+    scene.add( wireframe_10 );
 
     //window resize 대응
     window.addEventListener('resize', onWindowResize, false);
 }
 
 function update() {
+    requestAnimationFrame(update);
 
-    requestAnimationFrame( update );
-
-    // main scene
-
-    renderer.setClearColor( 0x000000, 0 );
-
-    renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
-
-    // renderer will set this eventually
-    matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
-
+    controls.update();
     renderer.render( scene, camera );
-
-    // inset scene
-
-    renderer.setClearColor( 0x222222, 1 );
-
-    renderer.clearDepth(); // important!
-
-    renderer.setScissorTest( true );
-
-    renderer.setScissor( 20, 20, insetWidth, insetHeight );
-
-    renderer.setViewport( 20, 20, insetWidth, insetHeight );
-
-    // renderer will set this eventually
-    matLine.resolution.set( insetWidth, insetHeight ); // resolution of the inset viewport
-
- 
-
-    renderer.setScissorTest( false );
-
 }
 
 function onWindowResize() {
+    matLine.resolution.set( window.innerWidth, window.innerHeight ); 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
