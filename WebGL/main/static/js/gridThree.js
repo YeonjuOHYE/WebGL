@@ -22,6 +22,8 @@ const makeCube = function (x, y, z) {
   return cube;
 };
 
+
+
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
 controls.update();
