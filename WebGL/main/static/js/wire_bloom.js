@@ -38,7 +38,7 @@ function start() {
     document.getElementById("threejs_canvas").appendChild(renderer.domElement);
 
     camera.position.set(- 5, 2.5, - 3.5);
-    // scene.add( camera ); //?
+
     controls = new OrbitControls(camera, renderer.domElement);
 
     //light
