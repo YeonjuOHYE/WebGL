@@ -7,7 +7,7 @@ git clone https://github.com/YeonjuOHYE/WebGL.git
 cd WebGL
 pip install -r requirements.txt
 cd WebGL
-python manager.py runserver
+python manage.py runserver
 
 http://127.0.0.1:8000/
 ```
