@@ -108,7 +108,7 @@ function update() {
     particleLight.position.y = Math.cos(timer * 5) * 400;
     particleLight.position.z = Math.cos(timer * 3) * 300;
 
-    cube.rotation.y = timer;
+    // cube.rotation.y = timer;
 
     if (usePostProcess)
         effect.render(scene, camera);
