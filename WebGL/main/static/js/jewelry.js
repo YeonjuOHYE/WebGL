@@ -85,6 +85,8 @@ function start() {
         scene.add(parent);
     });
 
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
     new RGBELoader()
         .setDataType(THREE.UnsignedByteType)
         .setPath('/media/jewelry/')
@@ -100,8 +102,6 @@ function start() {
 
         });
 
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    pmremGenerator.compileEquirectangularShader();
 
     //light
     const ambientLight = new THREE.AmbientLight(0x222222);
@@ -156,7 +156,7 @@ function update() {
     requestAnimationFrame(update);
     gemFrontMaterial.reflectivity = gemBackMaterial.reflectivity = guiParams.reflectivity;
 
-    parent.rotation.y += 0.005
+    // parent.rotation.y += 0.005
     renderer.render(scene, camera);
 }
 
