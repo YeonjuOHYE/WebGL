@@ -44,7 +44,7 @@ function start() {
 
     gemFrontMaterial = new THREE.MeshPhysicalMaterial({
         map: null,
-        color: 0x008800,
+        color: 0x00b2ff,
         metalness: 0,
         roughness: 0,
         opacity: 0.25,
@@ -70,7 +70,7 @@ function start() {
             itemsLoaded + ' of ' + itemsTotal + ' files.');
     };
     const loader = new OBJLoader(manager);
-    loader.load('/media/jewelry/emerald.obj', function (object) {
+    loader.load('/media/main/jewelry/emerald.obj', function (object) {
         //모든 child object까지 검색하여 함수를 실행시킴
         const mesh_back = object.children[0];
         const mesh_front = mesh_back.clone()
@@ -89,7 +89,7 @@ function start() {
     pmremGenerator.compileEquirectangularShader();
     new RGBELoader()
         .setDataType(THREE.UnsignedByteType)
-        .setPath('/media/jewelry/')
+        .setPath('/media/main/jewelry/')
         .load('royal_esplanade_1k.hdr', function (hdrEquirect) {
 
             const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular(hdrEquirect);

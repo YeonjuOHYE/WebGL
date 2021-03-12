@@ -64,7 +64,7 @@ function start() {
     composer.addPass(bloomPass);
 
     // load .glb model file
-    new GLTFLoader().load('/media/wire_bloom/PrimaryIonDrive.glb', function (gltf) {
+    new GLTFLoader().load('/media/main/wire_bloom/PrimaryIonDrive.glb', function (gltf) {
         const model = gltf.scene;
         scene.add(model);
 
