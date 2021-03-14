@@ -2,8 +2,9 @@ import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 import { RGBELoader } from '../jsm/loaders/RGBELoader.js';
 
 let renderer, scene, camera, controls;
-let bubble;
+let bubble,bubble_2;
 let cloud_texture;
+let bubble_g, base;
 start();
 update();
 
@@ -23,8 +24,9 @@ function start() {
     controls = new OrbitControls(camera, renderer.domElement);
 
 
-    const bubble_g = new THREE.SphereGeometry(5,32,32);
-
+    bubble_g = new THREE.SphereBufferGeometry(5,32,32);
+    base = bubble_g.attributes.position.array.slice()
+    // base
     const  bubble_m = new THREE.MeshPhysicalMaterial({
         map: null,
         color: 0xffffff,
@@ -37,7 +39,7 @@ function start() {
         premultipliedAlpha: true,
         reflectivity: 0
     });
-    console.log(bubble_m);
+
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     new RGBELoader()
@@ -79,8 +81,7 @@ function start() {
             alphaMap: texture,
             transparent: true
         });
-        console.log(bubble_m2);
-        const bubble_2 = new THREE.Mesh(bubble_g, bubble_m2);
+        bubble_2 = new THREE.Mesh(bubble_g, bubble_m2);
         scene.add(bubble_2);
     });
 
@@ -104,6 +105,28 @@ function update() {
     cloud_texture.offset.x = Math.sin(timer*6)/4 + Math.cos(timer*2)/1.5;
     cloud_texture.offset.y = Math.sin(timer*2)/4 + Math.cos(timer*3)/3;
 
+    const norm =  bubble_g.attributes.normal.array;
+    bubble_g.attributes.position.array.forEach((val,i,arr)=>{
+        const place = i % 3;
+        if(place ===0) //x
+        {
+            arr[i] = base[i] + norm[i] * Math.sin((i*0.001+timer*10)*1.5 ) *0.1;
+        }
+        if(place ===1) //y
+        {
+            arr[i] = base[i] + norm[i] * Math.sin((i*0.002+ timer*5)*1 ) *0.1;
+        }
+        if(place ===2) //z
+        {
+            // arr[i] = base[i] + norm[i] * Math.sin(timer*10 ) *0.5;
+        }
+    });
+    bubble_g.computeVertexNormals()
+    bubble_g.normalizeNormals();
+    bubble_g.attributes.position.needsUpdate = true;
+
+    bubble.rotation.set(0,0,timer);
+    bubble_2.rotation.set(0,0,timer);
     renderer.render(scene, camera);
 }
 
