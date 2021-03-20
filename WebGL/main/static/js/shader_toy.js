@@ -1,7 +1,5 @@
-import { OrbitControls } from '../jsm/controls/OrbitControls.js';
-import { RGBELoader } from '../jsm/loaders/RGBELoader.js';
-
-let renderer, scene, camera, contorls;
+let renderer, scene, camera;
+let uniforms;
 start();
 update();
 
@@ -18,27 +16,16 @@ function start() {
     -1, // near,
       1, // far
   );
-  // renderer.autoClearColor = false;
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.getElementById("threejs_canvas").appendChild(renderer.domElement);
 
-  contorls = new OrbitControls(camera, renderer.domElement);
-  
   const plane = new THREE.PlaneGeometry(2, 2);
- 
   const fShader = document.getElementById('fragmentShader').innerHTML;
-  const loader = new THREE.TextureLoader();
-  const texture = loader.load('https://threejsfundamentals.org/threejs/resources/images/bayer.png');
-  texture.minFilter = THREE.NearestFilter;
-  texture.magFilter = THREE.NearestFilter;
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  const uniforms = {
+
+  uniforms = {
     iTime: { value: 0 },
     iResolution:  { value: new THREE.Vector3() },
-    iMouse:  { value: new THREE.Vector4() },
-    iChannel0: { value: texture },
   };
 
   const material = new THREE.ShaderMaterial({
@@ -48,18 +35,37 @@ function start() {
 
   scene.add(new THREE.Mesh(plane, material));
   
+  // add text
+  const loader = new THREE.FontLoader();
+  loader.load('/media/main/fonts/helvetiker_regular.typeface.json', function (font) {
+    const message = "SHADER TOY";
+    const text_g = new THREE.TextGeometry(message, {
+        font: font,
+        size: 0.15,
+        height: 1,
+    });
+
+    const text_m = new THREE.MeshBasicMaterial({
+      color : 0xffffff,
+      opacity: 0.5,
+      transparent : true})
+    const text = new THREE.Mesh(text_g, text_m)
+    text.position.set(-0.55,-0.05,0)
+    text.scale.set(0.8,1,1)
+    scene.add(text);
+  });
+
   //window resize 대응
   window.addEventListener('resize', onWindowResize, false);
 }
 
 function update(){
-  requestAnimationFrame(update);
-  const time = Date.now() * 0.001;  // convert to seconds
   
-  // const canvas = renderer.domElement;
-  // uniforms.iResolution.value.set(canvas.width, canvas.height, 1);
-  // uniforms.iTime.value = time;
-
+  const time = requestAnimationFrame(update) * 0.01;
+  
+  uniforms.iResolution.value.set(window.innerWidth,  window.innerHeight, 1);
+  uniforms.iTime.value = time;
+  
   renderer.render(scene, camera);
 }
 

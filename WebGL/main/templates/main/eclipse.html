@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block title %}
+<script type="module" src="{% static 'js/eclipse.js'%}"></script>
+{% endblock %}
+
+{% block DOM %}
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        uniform vec3 iResolution;
+        uniform vec4 iMouse;
+        uniform float iTime;
+
+        void mainImage( out vec4 fragColor, in vec2 fragCoord )
+        {
+            // 0~1280 0~720 -> 
+            //~1.33~1.33, -0.75~0.75 
+            vec2 uv = 1.5*(2.0*fragCoord.xy - iResolution.xy) / iResolution.y;
+            vec2 mouse = 1.5*(2.0*iMouse.xy - iResolution.xy) / iResolution.y;
+
+            float ambient = 0.2;
+            float PI_2 = 3.141592 * 2.0;
+            
+            float red = cos(iTime) / 2.0 + 0.5;
+            float green = cos(iTime+ PI_2 * 2.0 / 3.0 ) / 2.0 + 0.5;
+            float blue = cos(iTime+ PI_2 / 3.0) / 2.0 + 0.5;
+            
+            vec3 light_color = vec3(red, green, blue) + ambient;
+
+            float light = 0.15 / distance(normalize(uv), uv);
+            if(length(uv) < 1.0){
+                light *= 0.15 / distance(normalize(uv-mouse)*0.7, uv-mouse);
+            }
+            
+	        fragColor = vec4(light*light_color, 1.0);
+        }
+        void main() {
+            mainImage(gl_FragColor, gl_FragCoord.xy);
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+{% endblock %}
