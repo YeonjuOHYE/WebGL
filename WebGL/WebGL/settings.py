@@ -25,7 +25,7 @@ SECRET_KEY = "s)t^*yhz$xw4d6=)ebo1-!xrk)(ya7p9ktg%#kpdgneh7&*%+k"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["community.pythonanywhere.com"]
 
 
 # Application definition
@@ -127,7 +127,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 MEDIA_URL = "/media/"
 
-#settings.py
+# settings.py
 if DEBUG:
     import mimetypes
+
     mimetypes.add_type("application/javascript", ".js", True)
