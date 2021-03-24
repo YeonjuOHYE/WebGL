@@ -23,10 +23,17 @@ function start() {
 
   const plane = new THREE.PlaneGeometry(2, 2);
   const fShader = document.getElementById('fragmentShader').innerHTML;
+  const loader = new THREE.TextureLoader();
+  const texture = loader.load('/media/main/glitch/coding.png');
+  texture.minFilter = THREE.NearestFilter;
+  texture.magFilter = THREE.NearestFilter;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
 
   uniforms = {
     iTime: { value: 0 },
     iResolution: { value: new THREE.Vector3() },
+    iChannel0: { value: texture },
     iMouse: { value: new THREE.Vector4() },
   };
 
