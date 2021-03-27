@@ -16,15 +16,27 @@ function start() {
   scene.background = new THREE.Color(0x017143);
   camera.position.set(0, 0, 20);
   camera.lookAt(0, 0, 0);
-  const plane = new THREE.PlaneGeometry(10, 10);
+
   const fShader = document.getElementById('fragmentShader').innerHTML;
   const vShader = document.getElementById('vertexShader').innerHTML;
+
+  // const texture = loader.load('/media/main/glitch/starbucks.jpg');
   const loader = new THREE.TextureLoader();
-  const texture = loader.load('/media/main/glitch/starbucks.jpg');
-  texture.minFilter = THREE.NearestFilter;
-  texture.magFilter = THREE.NearestFilter;
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
+  const texture = loader.load('/media/main/glitch/starbucks.jpg', (texture) => {
+    texture.minFilter = THREE.NearestFilter;
+    texture.magFilter = THREE.NearestFilter;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+
+    const plane = new THREE.PlaneGeometry(10, 10);
+    const material = new THREE.ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: vShader,
+      fragmentShader: fShader,
+    });
+
+    scene.add(new THREE.Mesh(plane, material));
+  });
 
   uniforms = {
     iTime: { value: 0 },
@@ -33,14 +45,6 @@ function start() {
     iMouse: { value: new THREE.Vector4() },
     iRandNum: { value: 0 },
   };
-
-  const material = new THREE.ShaderMaterial({
-    uniforms: uniforms,
-    vertexShader: vShader,
-    fragmentShader: fShader,
-  });
-
-  scene.add(new THREE.Mesh(plane, material));
 
   //window resize 대응
   window.addEventListener('resize', onWindowResize, false);
