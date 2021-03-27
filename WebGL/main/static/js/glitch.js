@@ -9,22 +9,18 @@ function start() {
   //start
   scene = new THREE.Scene();
   renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-  camera = new THREE.OrthographicCamera(
-    -1, // left
-    1, // right
-    1, // top
-    -1, // bottom
-    -1, // near,
-    1, // far
-  );
+  camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.getElementById("threejs_canvas").appendChild(renderer.domElement);
-
-  const plane = new THREE.PlaneGeometry(2, 2);
+  scene.background = new THREE.Color(0x017143);
+  camera.position.set(0, 0, 20);
+  camera.lookAt(0, 0, 0);
+  const plane = new THREE.PlaneGeometry(10, 10);
   const fShader = document.getElementById('fragmentShader').innerHTML;
+  const vShader = document.getElementById('vertexShader').innerHTML;
   const loader = new THREE.TextureLoader();
-  const texture = loader.load('/media/main/glitch/coding.png');
+  const texture = loader.load('/media/main/glitch/starbucks.jpg');
   texture.minFilter = THREE.NearestFilter;
   texture.magFilter = THREE.NearestFilter;
   texture.wrapS = THREE.RepeatWrapping;
@@ -35,10 +31,12 @@ function start() {
     iResolution: { value: new THREE.Vector3() },
     iChannel0: { value: texture },
     iMouse: { value: new THREE.Vector4() },
+    iRandNum: { value: 0 },
   };
 
   const material = new THREE.ShaderMaterial({
     uniforms: uniforms,
+    vertexShader: vShader,
     fragmentShader: fShader,
   });
 
@@ -56,6 +54,7 @@ function update() {
 
   uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
   uniforms.iTime.value = time;
+  uniforms.iRandNum.value = Math.random();
   uniforms.iMouse.value.x = lerp(uniforms.iMouse.value.x, mouseX, 0.12);
   uniforms.iMouse.value.y = lerp(uniforms.iMouse.value.y, mouseY, 0.12);
 

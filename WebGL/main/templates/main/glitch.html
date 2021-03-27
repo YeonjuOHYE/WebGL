@@ -6,63 +6,72 @@
 {% endblock %}
 
 {% block DOM %}
+    <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec2 vUv;
+
+        void main(){
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        }
+    </script>
     <script id="fragmentShader" type="x-shader/x-fragment">
         uniform vec3 iResolution;
         uniform vec4 iMouse;
         uniform sampler2D iChannel0;
         uniform float iTime;
-        //2D (returns 0 - 1)
-        float random2d(vec2 n) { 
-            return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
-        }
-
-        float randomRange (in vec2 seed, in float min, in float max) {
-                return min + random2d(seed) * (max - min);
+        uniform float iRandNum;
+        varying vec2 vUv;
+        float remap (in float seed, in float min, in float max) {
+            //seed should be 0~1
+            return min + seed * (max - min);
         }
 
         // return 1 if v inside 1d range
         float insideRange(float v, float bottom, float top) {
-        return step(bottom, v) - step(top, v);
+            return step(bottom, v) - step(top, v);
         }
 
         //inputs
-        float AMT = 0.2; //0 - 1 glitch amount
-        float SPEED = 0.6; //0 - 1 speed
+        float GLITCH_COUNT = 29.0; 
+        float SPEED = 1.0; 
         
         void mainImage( out vec4 fragColor, in vec2 fragCoord )
         {
-            float time = floor(iTime * SPEED * 60.0);    
-            vec2 uv = fragCoord.xy / iResolution.xy;
-            
-            //copy orig
+            //float time = floor(iTime * SPEED);    
+            float time = iTime * SPEED;    
+            vec2 uv = vUv;
+            //copy origin
             vec3 outCol = texture(iChannel0, uv).rgb;
             
             //randomly offset slices horizontally
-            float maxOffset = AMT/2.0;
-            for (float i = 0.0; i < 10.0 * AMT; i += 1.0) {
-                float sliceY = random2d(vec2(time , 2345.0 + float(i)));
-                float sliceH = random2d(vec2(time , 9035.0 + float(i))) * 0.25;
-                float hOffset = randomRange(vec2(time , 9625.0 + float(i)), -maxOffset, maxOffset);
-                vec2 uvOff = uv;
-                uvOff.x += hOffset;
-                if (insideRange(uv.y, sliceY, fract(sliceY+sliceH)) == 1.0 ){
-                    outCol = texture(iChannel0, uvOff).rgb;
+            float sliceH = 1.0 / GLITCH_COUNT;
+            float glitchTime = time - floor(time);
+            float activeTime = 0.1;
+            if(glitchTime < activeTime ){
+                for (float i = 0.0; i < GLITCH_COUNT; i++) {
+                    float sliceY = i * 1.0 / GLITCH_COUNT;
+                    float hOffset = remap(sin(glitchTime*iRandNum+i)/2.0+0.5,-iRandNum/10.0, iRandNum/10.0);
+                    vec2 uvOff = uv;
+                    uvOff.x += hOffset;
+                    
+                    if (insideRange(uv.y, sliceY, sliceY+sliceH) == 1.0 ){
+                        outCol = texture(iChannel0, uvOff).rgb;
+                    }
                 }
-            }
-            
-            //do slight offset on one entire channel
-            float maxColOffset = AMT/6.0;
-            float rnd = random2d(vec2(time , 9545.0));
-            vec2 colOffset = vec2(randomRange(vec2(time , 9545.0),-maxColOffset,maxColOffset), 
-                            randomRange(vec2(time , 7205.0),-maxColOffset,maxColOffset));
-            if (rnd < 0.33){
-                outCol.r = texture(iChannel0, uv + colOffset).r;
-                
-            }else if (rnd < 0.66){
-                outCol.g = texture(iChannel0, uv + colOffset).g;
-                
-            } else{
-                outCol.b = texture(iChannel0, uv + colOffset).b;  
+                //do slight offset on one entire channel
+                float maxColOffset = GLITCH_COUNT/60.0;
+                vec2 colOffset = vec2(
+                     remap(sin((glitchTime*iRandNum)*7.0)/2.0+0.5, -iRandNum/5.0, iRandNum/10.0), 
+                     remap(cos((glitchTime*iRandNum)*11.0)/2.0+0.5, -iRandNum/20.0, iRandNum/20.0));
+                if (glitchTime*iRandNum < activeTime/3.0){
+                    outCol.r = texture(iChannel0, uv + colOffset).r;
+                }
+                else if (glitchTime*iRandNum < activeTime*2.0/3.0){
+                    outCol.g = texture(iChannel0, uv + colOffset).g;  
+                }
+                else{
+                    outCol.b = texture(iChannel0, uv + colOffset).b;  
+                }
             }
             
             fragColor = vec4(outCol,1.0);
