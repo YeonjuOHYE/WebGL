@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% load static %} {% block title %}
+<link rel="stylesheet" href="/static/css/transparent.css">
+<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+<script src="/static/js/transparent/Detector.js"></script>
+<script src="/static/js/transparent/Stats.js"></script>
+<script src="/static/js/transparent/THREEx.KeyboardState.js"></script>
+<script src="/static/js/transparent/THREEx.FullScreen.js"></script>
+<script src="/static/js/transparent/THREEx.WindowResize.js"></script>
+<script type="module" src="{% static 'js/transparent.js'%}"></script>
+{% endblock %} {% block body %}
+<img src="/static/img/sea.png" class="js-vhs-filter" />
+<svg>
+  <filter id="r"><feColorMatrix
+      type="matrix"
+      values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0 "/>
+  </filter>
+  <filter id="g"><feColorMatrix
+      type="matrix"
+      values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0 "/>
+  </filter>
+  <filter id="b"><feColorMatrix
+      type="matrix"
+      values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0 "/>
+  </filter>
+</svg>
+<script  src="/static/js/transparent/vhsFilter.js"></script>
+
+{% endblock %}
