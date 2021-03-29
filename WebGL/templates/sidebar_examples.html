@@ -19,7 +19,7 @@
     </div>
     <div class="w3-container 3-bar-block">
         {%for project in projects%}
-        <div class="w3-card-4 w3-margin-bottom card">
+        <div class="w3-card-4 w3-margin-bottom card project">
             {%if project.project_url == current_project.project_url%}
             <button id="change_button" class="w3-right w3-button w3-theme-d1" style="padding: 4px 10px 0px 10px;">썸네일
         수정</button> {% csrf_token %}
