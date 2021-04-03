@@ -1,6 +1,11 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 import { PLYLoader } from '../jsm/loaders/PLYLoader.js';
+import { EffectComposer } from '../jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from '../jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from '../jsm/postprocessing/ShaderPass.js';
+import { PixelShader } from '../jsm/shaders/PixelShader.js';
 let scene, renderer, camera, controls
+let composer, pixelPass, pixelSize;
 let h=Math.random(),s=0.9,l=0.8;
 let randomColor =new THREE.Color(h,s,l)
 let m1
@@ -9,7 +14,6 @@ start();
 update();
 
 function start() {
-    changeColor();
     console.log("js onload")
     // start
     scene = new THREE.Scene()
@@ -25,9 +29,14 @@ function start() {
     camera.lookAt(0, 0, 0);
 
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.rotateSpeed = 0.3;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 4;
+    controls.rotateSpeed = 1;
     controls.enableDamping = false;
+    controls.enableZoom = false;
     controls.enablePan = false;
+    controls.minPolarAngle = Math.PI/2;
+    controls.maxPolarAngle = Math.PI/2;
     controls.update();
 
     const loader = new THREE.CubeTextureLoader();
@@ -44,7 +53,6 @@ function start() {
         
         m1 = new THREE.MeshPhongMaterial( { color: randomColor, envMap: texture, refractionRatio: 0.8} );
         const loader = new PLYLoader();
-        console.log(m1);
         loader.load( '/media/main/fraction/Lucy100k.ply', function ( geometry ) {
 
             geometry.computeVertexNormals();
@@ -54,6 +62,8 @@ function start() {
             let mesh = new THREE.Mesh( geometry, m1 );
             mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
             scene.add( mesh );
+            
+            changeColor();
         });
     });
 
@@ -69,19 +79,30 @@ function start() {
     controls.addEventListener('change', changeColor);
     window.addEventListener('resize', onWindowResize, false);
     window.addEventListener("click", changeColor);
+
+    composer = new EffectComposer( renderer );
+    composer.addPass( new RenderPass( scene, camera ) );
+    pixelPass = new ShaderPass( PixelShader );
+    pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+    pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
+    composer.addPass( pixelPass );
 }
 
 function update(){
-  
+    const pos = camera.position.x/200
+    pixelSize= pos*pos*pos*15
+    pixelPass.uniforms[ "pixelSize" ].value = pixelSize;
     const time = requestAnimationFrame(update) * 0.01;
     controls.update();
-    renderer.render(scene, camera);
+    composer.render();
 }
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+
+    pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 }
 
 function changeColor(){
