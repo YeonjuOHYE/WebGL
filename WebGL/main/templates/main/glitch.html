@@ -61,8 +61,8 @@
                 //do slight offset on one entire channel
                 float maxColOffset = GLITCH_COUNT/60.0;
                 vec2 colOffset = vec2(
-                     remap(sin((glitchTime*iRandNum)*7.0)/2.0+0.5, -iRandNum/5.0, iRandNum/10.0), 
-                     remap(cos((glitchTime*iRandNum)*11.0)/2.0+0.5, -iRandNum/20.0, iRandNum/20.0));
+                    remap(sin((glitchTime*iRandNum)*7.0)/2.0+0.5, -iRandNum/5.0, iRandNum/10.0), 
+                    remap(cos((glitchTime*iRandNum)*11.0)/2.0+0.5, -iRandNum/20.0, iRandNum/20.0));
                 if (glitchTime*iRandNum < activeTime/3.0){
                     outCol.r = texture(iChannel0, uv + colOffset).r;
                 }

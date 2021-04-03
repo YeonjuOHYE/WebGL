@@ -12,7 +12,7 @@ def index(request):
 
 
 def examples(request):
-    projects = webgl_project.objects.all().order_by('-created_time')
+    projects = webgl_project.objects.all().order_by("-created_time")
 
     context = {"projects": projects}
     return render(request, "main/examples.html", context)
@@ -21,7 +21,7 @@ def examples(request):
 def gl_project(request, project_url):
     print(project_url)
 
-    projects = webgl_project.objects.all().order_by('-created_time')
+    projects = webgl_project.objects.all().order_by("-created_time")
     current_project = webgl_project.objects.get(project_url=project_url)
     print(current_project)
     context = {

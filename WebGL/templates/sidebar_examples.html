@@ -58,11 +58,14 @@
                 <img id="img_{{project.project_url}}" src="{{project.thumbnail.url}}" style="max-width:100%;" alt="thumbnail">
                 <br>
                 <span class="project_name">
-          {{project.project_name}}
-        </span>
+                    {{project.project_name}}
+                </span>
                 <span class="w3-right project_author">
-          {{project.author}}
-        </span>
+                    {{project.author}}
+                </span>
+                <span hidden class="project_url">
+                    {{project.project_url}}
+                </span>
             </a>
         </div>
         {%endfor%}
