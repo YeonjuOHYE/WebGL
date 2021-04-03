@@ -1,7 +1,7 @@
 import { OrbitControls } from '../jsm/controls/OrbitControls.js';
 import { PLYLoader } from '../jsm/loaders/PLYLoader.js';
 let scene, renderer, camera, controls
-let h=Math.random(),s=0.9,l=0.8;
+let h=Math.random(),s=0.9,l=0.9;
 let randomColor =new THREE.Color(h,s,l)
 let m1
 
@@ -16,7 +16,6 @@ function start() {
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
 
-    scene.background = randomColor;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById("threejs_canvas").appendChild(renderer.domElement);
@@ -39,10 +38,10 @@ function start() {
         '/media/main/fraction/pz.jpg',
         '/media/main/fraction/nz.jpg',
     ], (texture) => {
-        // scene.background = texture;
+        scene.background = texture;
         texture.mapping = THREE.CubeRefractionMapping;
         
-        m1 = new THREE.MeshPhongMaterial( { color: randomColor, envMap: texture, refractionRatio: 0.8} );
+        m1 = new THREE.MeshPhongMaterial( { color: randomColor, envMap: texture, refractionRatio: 0.99} );
         const loader = new PLYLoader();
         console.log(m1);
         loader.load( '/media/main/fraction/Lucy100k.ply', function ( geometry ) {
@@ -62,7 +61,7 @@ function start() {
     const ambient = new THREE.AmbientLight( 0xffffff );
     scene.add( ambient );
 
-    const pointLight = new THREE.PointLight( 0xffffff, 5 );
+    const pointLight = new THREE.PointLight( 0xffffff, 2 );
     scene.add( pointLight );
     pointLight.position.set(0,0,-50);
     
