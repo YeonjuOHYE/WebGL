@@ -6,7 +6,11 @@
 <link rel="stylesheet" href="{% static 'css/colorpicker.css'%}" type="text/css">
 {% endblock %}
 {% block body %}
-<input type="color" style='opacity:0;width:100px;position:absolute;' />
-<button style='width:100px;position:absolute;'>clickme</button>
+    
+{% endblock %}
+{% block DOM %}
+<input id="colorWell" type="color" style='opacity:0;width:100px;position:absolute;' />
+    <button style='width:100px;'>clickme</button>
 
+    <h3 id="temp">clickme</h3>
 {% endblock %}
