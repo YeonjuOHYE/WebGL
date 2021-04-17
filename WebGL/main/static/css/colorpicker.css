@@ -4,13 +4,7 @@ body {
   width: 100vw;
   height: 100vh;
 }
-/*you can even style the button hover*/
-input[type=color]:hover+button {
-  background: #fff
-}
-#panel {
-  background: red;
-}
+
 #threejs_canvas{
   position: fixed;
   top: 0;
@@ -18,4 +12,33 @@ input[type=color]:hover+button {
   right: 0;
   bottom: 0;
   z-index: -1;
+}
+
+#sidebarButton{
+  opacity:0;
+}
+
+#colorWell{
+  opacity:0;
+}
+
+.colorbutton{
+  opacity:1;
+  width:40%;
+  margin-left:30%;
+  margin-top:50%;
+  height:10%;
+  position:absolute;
+}
+
+.button {
+  padding: 0;
+  font-size: 30px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 50px;
+  color: #000;
+  border : 0px;
+  border-radius: 100px;
+  transition: all 0.2s ;
 }
