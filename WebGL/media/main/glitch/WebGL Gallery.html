@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<!-- saved from url=(0042)http://127.0.0.1:8000/examples/colorpicker -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="http://127.0.0.1:8000/static/favicon.ico">
+    <link rel="icon" type="image/png" href="http://127.0.0.1:8000/static/favicon.png">
+
+    <script src="./WebGL Gallery_files/jquery.min.js.다운로드"></script>
+    <script src="./WebGL Gallery_files/webgl-utils.js.다운로드"></script>
+
+    <link rel="stylesheet" href="./WebGL Gallery_files/w3.css">
+    <link rel="stylesheet" href="./WebGL Gallery_files/font-awesome.min.css">
+
+    <link rel="stylesheet" href="./WebGL Gallery_files/base.css" type="text/css">
+    <script type="text/javascript" src="./WebGL Gallery_files/three.js.다운로드"></script>
+
+    <script type="text/javascript" src="./WebGL Gallery_files/atoh.js.다운로드"></script>
+    
+<script type="module" src="./WebGL Gallery_files/colorpicker.js.다운로드"></script>
+<link rel="stylesheet" href="./WebGL Gallery_files/colorpicker.css" type="text/css">
+
+
+    <title>WebGL Gallery</title>
+</head>
+
+<body style="">
+    
+<!-- Side Navigation -->
+<nav class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-theme" style="display:none; overflow-x: hidden;" id="mySidebar">
+    <!--close button -->
+    <div style="position:fixed;" class="w3-theme">
+        <i onclick="w3_close()" class="fa fa-close w3-xlarge w3-button w3-theme"></i>
+        <!-- <div class="" style="display: inline"> -->
+        <!-- <i class="fa fa-search" ></i> -->
+        <input class="searchinput w3-large w3-border-0" style="width: 0px;" type="text" name="query" placeholder=" 검색" width="200" onkeyup="mySearchFunction(this)">
+        <!-- </div> -->
+    </div>
+
+    <div class="w3-center w3-padding-32">
+        <a href="http://127.0.0.1:8000/examples/">
+            <div class="w3-padding-32 w3-xxlarge">
+                <b>WebGL<br>Examples</b>
+            </div>
+        </a>
+    </div>
+    <div class="w3-container 3-bar-block">
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/2dMetal">
+                <img id="img_2dMetal" src="./WebGL Gallery_files/Screen_Shot_2021-04-11_at_11.37.37_AM.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    2dMetal
+                </span>
+                <span class="w3-right project_author">
+                    오연주
+                </span>
+                <span hidden="" class="project_url">
+                    2dMetal
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <button id="change_button" class="w3-right w3-button w3-theme-d1" style="padding: 4px 10px 0px 10px;">썸네일
+        수정</button> <input type="hidden" name="csrfmiddlewaretoken" value="JbFlsxOFRbtMLTsIC75x6jHmzjdokYZPZ62Nb60YpYp7GNNHvy1mmXPDhF664bDc">
+            <input hidden="" id="new_thumbnail_base64" name="new_thumbnail_base64" value="">
+
+            <script>
+                function changeThumbnail() {
+                    var threejs_canvas = $('#threejs_canvas')[0];
+                    var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']")[0];
+                    var new_thumbnail_base64 = $('#new_thumbnail_base64')[0];
+
+                    let canvas = $('#threejs_canvas').children("canvas")[0];
+                    let base64 = canvas.toDataURL()
+
+                    $.ajax({
+                            url: "/examples/colorpicker/update_thumbnail",
+                            data: {
+                                "csrfmiddlewaretoken": csrfmiddlewaretoken.value,
+                                "new_thumbnail_base64": base64
+                            },
+                            type: "POST"
+                        })
+                        .done(function(response) {
+                            $("#img_colorpicker")[0].src = "/media/" + response['new_url']
+                            Snackbar(true)
+                        })
+                        .fail(function() {
+                            Snackbar(false)
+                        })
+                }
+
+                $('#change_button')[0].addEventListener('click', changeThumbnail)
+            </script>
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/colorpicker">
+                <img id="img_colorpicker" src="./WebGL Gallery_files/thumbnail_default.jpg" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Colorpicker
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    colorpicker
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/pixelization">
+                <img id="img_pixelization" src="./WebGL Gallery_files/pixelization1617435520.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Pixelization
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    pixelization
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/refraction">
+                <img id="img_refraction" src="./WebGL Gallery_files/refraction1617433407.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Refraction
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    refraction
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/transparent">
+                <img id="img_transparent" src="./WebGL Gallery_files/thumbnail_default.jpg" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    transparent
+                </span>
+                <span class="w3-right project_author">
+                    transparent
+                </span>
+                <span hidden="" class="project_url">
+                    transparent
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/glitch">
+                <img id="img_glitch" src="./WebGL Gallery_files/glitch1616836514.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Glitch
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    glitch
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/circle_wave">
+                <img id="img_circle_wave" src="./WebGL Gallery_files/circle_wave1616256239.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Circle Wave
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    circle_wave
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/shader_toy">
+                <img id="img_shader_toy" src="./WebGL Gallery_files/shader_toy1616240619.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    ShaderToy
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    shader_toy
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/eclipse">
+                <img id="img_eclipse" src="./WebGL Gallery_files/swirling1616239573.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Eclipse
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    eclipse
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/bubble">
+                <img id="img_bubble" src="./WebGL Gallery_files/bubble1615541210.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Bubble
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    bubble
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/jewelry">
+                <img id="img_jewelry" src="./WebGL Gallery_files/jewelry1615541280.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Jewelry
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    jewelry
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/toon_shading">
+                <img id="img_toon_shading" src="./WebGL Gallery_files/toon_shading1614504631.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Toon Shading
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    toon_shading
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/gridThree">
+                <img id="img_gridThree" src="./WebGL Gallery_files/Screen_Shot_2021-02-22_at_12.02.38_AM_h2rJvIy.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    gridThree
+                </span>
+                <span class="w3-right project_author">
+                    yeonju
+                </span>
+                <span hidden="" class="project_url">
+                    gridThree
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/wire_bloom">
+                <img id="img_wire_bloom" src="./WebGL Gallery_files/wire_bloom1614417713.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Wire Bloom
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    wire_bloom
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/wireframe">
+                <img id="img_wireframe" src="./WebGL Gallery_files/wireframe1613810208.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Wireframe
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    wireframe
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/vertex_shader">
+                <img id="img_vertex_shader" src="./WebGL Gallery_files/vertex_shader1613127207.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Vertex Shader
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    vertex_shader
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/list_viewer">
+                <img id="img_list_viewer" src="./WebGL Gallery_files/list_viewer1613287701.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    List Viewer
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    list_viewer
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/likelion">
+                <img id="img_likelion" src="./WebGL Gallery_files/likelion1611996179.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    LikeLion
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    likelion
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/charS">
+                <img id="img_charS" src="./WebGL Gallery_files/Screen_Shot_2021-02-14_at_11.15.51_AM.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    charS
+                </span>
+                <span class="w3-right project_author">
+                    오연주
+                </span>
+                <span hidden="" class="project_url">
+                    charS
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/text">
+                <img id="img_text" src="./WebGL Gallery_files/text1610160515.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Text
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    text
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/box_raycast">
+                <img id="img_box_raycast" src="./WebGL Gallery_files/box_raycast1609465119.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    BoxRaycast
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    box_raycast
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/3dF">
+                <img id="img_3dF" src="./WebGL Gallery_files/KakaoTalk_20210101_094052673.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    3dF
+                </span>
+                <span class="w3-right project_author">
+                    연주
+                </span>
+                <span hidden="" class="project_url">
+                    3dF
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/skybox">
+                <img id="img_skybox" src="./WebGL Gallery_files/skybox1608996157.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Skybox
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    skybox
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/earth_globe_3d_anim">
+                <img id="img_earth_globe_3d_anim" src="./WebGL Gallery_files/earth_globe_3d_anim1608973363.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    EarthGlobe3D_anim
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    earth_globe_3d_anim
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/earth_globe_3d_fast">
+                <img id="img_earth_globe_3d_fast" src="./WebGL Gallery_files/earth_globe_3d_fast1608961557.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    EarthGlobe3D_fast
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    earth_globe_3d_fast
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/earth_globe_3d_slow">
+                <img id="img_earth_globe_3d_slow" src="./WebGL Gallery_files/earth_globe_3d_slow1608957386.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    EarthGlobe3D_slow
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    earth_globe_3d_slow
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/earth_globe_2d">
+                <img id="img_earth_globe_2d" src="./WebGL Gallery_files/data_2d_parse.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    EarchGlobe2D
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    earth_globe_2d
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/circle">
+                <img id="img_circle" src="./WebGL Gallery_files/circle.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Circle
+                </span>
+                <span class="w3-right project_author">
+                    연주
+                </span>
+                <span hidden="" class="project_url">
+                    circle
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/fog">
+                <img id="img_fog" src="./WebGL Gallery_files/fog1608398850.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Fog
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    fog
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/texture_gui">
+                <img id="img_texture_gui" src="./WebGL Gallery_files/texture_gui1615541266.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Texture GUI
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    texture_gui
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/basic">
+                <img id="img_basic" src="./WebGL Gallery_files/basic1608398807.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Basic
+                </span>
+                <span class="w3-right project_author">
+                    수강
+                </span>
+                <span hidden="" class="project_url">
+                    basic
+                </span>
+            </a>
+        </div>
+        
+        <div class="w3-card-4 w3-margin-bottom card project">
+            
+            <a class="w3-bar-item  w3-button  w3-hover-gray" href="http://127.0.0.1:8000/examples/triangle">
+                <img id="img_triangle" src="./WebGL Gallery_files/triangle.png" style="max-width:100%;" alt="thumbnail">
+                <br>
+                <span class="project_name">
+                    Triangle
+                </span>
+                <span class="w3-right project_author">
+                    연주
+                </span>
+                <span hidden="" class="project_url">
+                    triangle
+                </span>
+            </a>
+        </div>
+        
+    </div>
+    <script>
+        function mySearchFunction(input) {
+            var cards = $('.card')
+            var query = input.value
+            var query_atoh = AtoH.convert(query)
+
+            console.log(AtoH.convert(query))
+
+            $.each(cards, function(index, card) {
+                a = $(card).children()
+
+                card.style.display = 'inline-block'
+                if (!(
+                        a.children(".project_name")[0].innerText.toLowerCase().includes(query.toLowerCase()) ||
+                        a.children(".project_author")[0].innerText.toLowerCase().includes(query.toLowerCase()) ||
+                        a.children(".project_name")[0].innerText.toLowerCase().includes(query_atoh) ||
+                        a.children(".project_author")[0].innerText.toLowerCase().includes(query_atoh)
+                    )) {
+                    card.style.display = 'none'
+                }
+
+                a.children(".project_name").innerText
+                a.children(".project_author").innerText
+            });
+        }
+    </script>
+    <div id="snackbar">Some text some message..</div>
+    <script>
+        function Snackbar(success) {
+            var x = $("#snackbar")[0];
+            if (success) {
+                x.className = "show w3-green";
+                x.textContent = "썸네일 변경 성공"
+            } else {
+                x.className = "show w3-red";
+                x.textContent = "썸네일 변경 실패"
+            }
+
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 2000);
+        }
+    </script>
+</nav>
+
+<!-- Header -->
+<i onclick="w3_open()" id="sidebarButton" class="fa fa-bars w3-xlarge w3-button w3-theme" style="position:fixed;left:0;"></i>
+
+
+<script>
+    // Side navigation
+    function w3_open() {
+        var x = document.getElementById("mySidebar");
+        var y = $(".searchinput")
+        var z = $(".fa-close")
+        ratio = window.innerHeight / window.innerWidth
+        if (ratio >= 1.32) {
+            x.style.width = "100%";
+        } else {
+            x.style.width = "25%";
+
+        }
+
+        x.style.display = "block";
+        y.css('width', x.offsetWidth - z[0].offsetWidth - 20)
+    }
+
+    window.addEventListener('resize', function() {
+        var x = document.getElementById("mySidebar");
+        var y = $(".searchinput")
+        var z = $(".fa-close")
+        y.css('width', x.offsetWidth - z[0].offsetWidth - 20)
+    })
+
+    function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+    }
+</script>
+
+
+    
+<button class="colorbutton">Pick Color</button>
+<input id="colorWell" class="colorbutton" type="color">
+
+<div id="colorPanel" class="w3-row">
+    <div class="w3-col s1 m2 l3"></div>
+    <div id="colorPanelContent" class="w3-col s10 m8 l6">
+        <p id="colorTitle">Color Info</p>
+        <div class="w3-grey" style="margin-left:5%; width: 90%;">
+            <div class="w3-red" style="width: 40%;display: inline;">
+            </div>
+            <div class="w3-blue" style="width: 60%;display: inline;">
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+
+
+    <div id="threejs_canvas">
+        
+    
+
+    <canvas width="887" height="902" style="display: block; width: 887px; height: 902px;"></canvas></div>
+
+    
+
+
+</body></html>

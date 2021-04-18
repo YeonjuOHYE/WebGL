@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;400;600&display=swap');
+
+* {
+  margin: 0;
+  padding:0;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 200;
+}
+body{
+  width: 100vw;
+  height: 100vh;
+}
+
+div{
+  width: 100%;
+  height: 100%;
+}
+#threejs_canvas{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+#sidebarButton{
+  opacity:0;
+}
+
+#colorWell{
+  opacity:0;
+}
+
+.colorbutton{
+  width:40vw;
+  margin-left:30vw;
+  margin-top:55vh;
+  height:10vh;
+  position:fixed;
+  font-size: 35px;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 600;
+  text-align: center;
+  line-height: 50px;
+  color: #3d3d3d;
+  border : 0px;
+  border-radius: 100px;
+  transition: all 0.2s;
+}
+
+#colorPanel{
+  position:fixed;
+  margin-top:70vh;
+  height:30vh;
+
+  font-size: 30px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s;
+}
+#colorPanelContent{
+  background-color: white;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+}
+
+#colorTitle{
+  margin : 10px;
+}
+
+#colorTable{
+  margin : 30px;
+}

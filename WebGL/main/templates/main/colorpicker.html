@@ -9,8 +9,65 @@
     
 {% endblock %}
 {% block DOM %}
-<button class="colorbutton button">Pick Color</button>
+<button id="colorButton" class="colorbutton">Pick Color</button>
 <input id="colorWell" class="colorbutton" type="color"/>
 
+<div id="colorPanel" class="div">
+    <div class="div w3-col s1 m2 l3"></div>
+    <div id ="colorPanelContent" class="div w3-col s10 m8 l6">
+        <p id="colorTitle">Color Info</p>
+        <div style="height:0.5%; width: 90%; margin-left:5%;  margin-bottom:2%; background-color:#4d4d4d "></div>
+        <div id ="colorTable" style="margin-left:5%; width: 90%;">
+            <div class="w3-col s5 m5 l5">
+                <p>HEX</p>
+                <p>&nbsp;</p>
+                <p>RGB</p>
+                <p>&nbsp;</p>
+                <p>CMYK</p>
+                <p>&nbsp;</p>
+                <p>HSL</p>
+                <p>&nbsp;</p>
+            </div>
+            <div class="w3-col s7 m7 l7">
+            
+                <p><span class="w3-tag w3-round-large n">#1d1d1d</span></p>
+                <p><span class="w3-tag w3-round-large n">1d1d1d</span></p>
+                <p>
+                    <span class="w3-tag w3-round-large r">29</span>
+                    <span class="w3-tag w3-round-large g">29</span>
+                    <span class="w3-tag w3-round-large b">29</span>
+                </p>
+                <p>                    
+                    <span class="w3-tag w3-round-large r">0.11</span>
+                    <span class="w3-tag w3-round-large g">0.11</span>
+                    <span class="w3-tag w3-round-large b">0.11</span>
+                </p>
+                <p>
+                    <span class="w3-tag w3-round-large c">0</span>
+                    <span class="w3-tag w3-round-large m">0</span>
+                    <span class="w3-tag w3-round-large y">0</span>
+                    <span class="w3-tag w3-round-large k">89</span>
+                </p>
+                <p>
+                    <span class="w3-tag w3-round-large c">0</span>
+                    <span class="w3-tag w3-round-large m">0</span>
+                    <span class="w3-tag w3-round-large y">0</span>
+                    <span class="w3-tag w3-round-large k">89</span>
+                </p>
+                <p>                    
+                    <span class="w3-tag w3-round-large n">0</span>
+                    <span class="w3-tag w3-round-large n">0</span>
+                    <span class="w3-tag w3-round-large n">11</span>
+                </p>
+                <p>                    
+                    <span class="w3-tag w3-round-large n">0</span>
+                    <span class="w3-tag w3-round-large n">0</span>
+                    <span class="w3-tag w3-round-large n">11</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="snackbar2">Sogemessage..</div>
 
 {% endblock %}

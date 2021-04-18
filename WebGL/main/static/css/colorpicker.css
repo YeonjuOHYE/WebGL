@@ -1,8 +1,19 @@
-@import url("https://webglfundamentals.org/webgl/resources/webgl-tutorials.css");
-body {
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;400;600&display=swap');
+
+* {
   margin: 0;
+  padding:0;
+
+}
+body{
   width: 100vw;
   height: 100vh;
+}
+
+.div{
+  width: 100%;
+  height: 100%;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 #threejs_canvas{
@@ -23,22 +34,129 @@ body {
 }
 
 .colorbutton{
-  opacity:1;
-  width:40%;
-  margin-left:30%;
-  margin-top:50%;
-  height:10%;
-  position:absolute;
-}
-
-.button {
-  padding: 0;
-  font-size: 30px;
+  width:40vw;
+  margin-left:30vw;
+  margin-top:65vh;
+  height:10vh;
+  position:fixed;
+  font-size: 35px;
+  font-family: 'Source Sans Pro', sans-serif;
   font-weight: 600;
   text-align: center;
   line-height: 50px;
-  color: #000;
+  color: #3d3d3d;
   border : 0px;
   border-radius: 100px;
-  transition: all 0.2s ;
+  transition: all 0.4s;
+}
+
+#colorPanel{
+  position:fixed;
+  margin-top:100vh;
+  height:35vh;
+
+  font-size: 30px;
+  font-weight: 400;
+  text-align: center;
+  transition: all 0.4s;
+}
+#colorPanelContent{
+  background-color: white;
+  border-top-right-radius: 30px;
+  border-top-left-radius: 30px;
+  
+}
+
+#colorTable{
+  font-size: 2vh;
+  text-align: left; 
+  font-weight: 400;
+}
+
+#colorTitle{
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 200;
+  margin : 5px;
+  font-size: 3vh;
+}
+
+#colorTable p{
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 600;
+  margin-top: 3px;
+  text-align: center;
+}
+
+#colorTable span{
+  
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 400;
+  cursor:pointer;
+}
+
+.n{
+  background-color:#666666;
+}
+.r{
+  background-color:#ec4141;
+}
+.g{
+  background-color:#4cb821;
+}
+.b{
+  background-color:#4548ed; 
+}
+
+.c{
+  background-color:#0ed7d7;
+}
+.m{
+  background-color:#d70ed7;
+}
+.y{
+  background-color:#d7d70e; 
+}
+.k{
+  background-color:#333333; 
+}
+
+#snackbar2 {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 250px; /* Set a default minimum width */
+  margin-left: -125px; /* Divide value of min-width by 2 */
+  background-color: #4caf50; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 2px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 4; /* Add a z-index if needed */
+  left: 50%; /* Center the snackbar */
+  bottom: 30px; /* 30px from the bottom */
+  border-radius: 100px;
+}
+#snackbar2.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;} 
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;} 
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
 }
