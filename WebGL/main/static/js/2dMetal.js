@@ -1,4 +1,18 @@
 console.clear();
+var textCtx = document.createElement("canvas").getContext("2d");
+
+// Puts text in center of canvas.
+function makeTextCanvas(text, width, height) {
+  textCtx.canvas.width = width;
+  textCtx.canvas.height = height;
+  textCtx.font = "100px monospace";
+  textCtx.textAlign = "center";
+  textCtx.textBaseline = "middle";
+  textCtx.fillStyle = "black";
+  textCtx.clearRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
+  textCtx.fillText(text, width / 2, height / 2);
+  return textCtx.canvas;
+}
 
 const instancedQuadVertexShader = `#version 300 es
 
@@ -34,6 +48,7 @@ const instancedQuadVertexShader = `#version 300 es
       0.0,
       0.0
     );
+
     gl_Position = u_projectionMatrix * newPosition;
     v_uv = a_uv;
   }
@@ -136,6 +151,8 @@ const fullscreenQuadFragmentShader = `#version 300 es
       fillColor,
       cutoff
     );
+    //outputColor = inputColor;
+    
   }
 `;
 let fullscreenQuadVertexBuffer;
@@ -145,6 +162,79 @@ const canvas = document.getElementById("canvas");
 const gl = canvas.getContext("webgl2");
 const hint = document.getElementById("hint");
 const hint2 = document.getElementById("hint2");
+
+const textProgramInfo = webglUtils.createProgramInfo(gl, [
+  "text-vertex-shader",
+  "text-fragment-shader",
+]);
+const textBufferInfo = primitives.createPlaneBufferInfo(
+  gl,
+  0.5,
+  0.5,
+  1,
+  1,
+  m4.xRotation(Math.PI / 2)
+);
+var textUniforms = {
+  u_matrix: m4.identity(),
+  u_texture: null, // we'll set it at render time
+  u_color: [0, 0, 0, 1], // black
+};
+
+// create text textures, one for each letter
+var textTextures = [
+  "a", // 0
+  "b", // 1
+  "c", // 2
+  "d", // 3
+  "e", // 4
+  "f", // 5
+  "g", // 6
+  "h", // 7
+  "i", // 8
+  "j", // 9
+  "k", // 10
+  "l", // 11
+  "m", // 12,
+  "n", // 13,
+  "o", // 14,
+  "p", // 14,
+  "q", // 14,
+  "r", // 14,
+  "s", // 14,
+  "t", // 14,
+  "u", // 14,
+  "v", // 14,
+  "w", // 14,
+  "x", // 14,
+  "y", // 14,
+  "z", // 14,
+].map(function (name) {
+  var textCanvas = makeTextCanvas(name, canvas.width, canvas.height);
+  var textWidth = textCanvas.width;
+  var textHeight = textCanvas.height;
+  var textTex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, textTex);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+  //gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, true);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    textCanvas
+  );
+  // make sure we can render it even if it's not a power of 2
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return {
+    texture: textTex,
+    width: textWidth,
+    height: textHeight,
+  };
+});
 
 /* Check if device supports float or half-float textures */
 const rgba32fSupported =
@@ -242,6 +332,7 @@ requestAnimationFrame(updateFrame);
 /* Enable WebGL alpha blending */
 gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 /* How many quads we want rendered */
 const QUADS_COUNT = 1000;
@@ -763,6 +854,73 @@ function updateFrame(timestampMs) {
     }
     gl.useProgram(null);
     gl.bindVertexArray(null);
+  }
+
+  //gl.enable(gl.BLEND);
+  //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  //gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+  //gl.depthMask(false);
+
+  gl.useProgram(textProgramInfo.program);
+  webglUtils.setBuffersAndAttributes(gl, textProgramInfo, textBufferInfo);
+
+  var name = "h";
+  var pos = [500, 500, 500];
+  const projectionMatrix = new Float32Array([
+    2 / innerWidth,
+    0,
+    0,
+    0,
+    0,
+    -2 / innerHeight,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    -1,
+    1,
+    0,
+    1,
+  ]);
+
+  // for each leter
+  for (var ii = 0; ii < name.length; ++ii) {
+    var letter = name.charCodeAt(ii);
+    var letterNdx = letter - "a".charCodeAt(0);
+
+    // select a letter texture
+    var tex = textTextures[letterNdx];
+
+    // because pos is in view space that means it's a vector from the eye to
+    // some position. So translate along that vector back toward the eye some distance
+    var fromEye = m4.normalize(pos);
+    //console.log(fromEye);
+    var amountToMoveTowardEye = 150; // because the F is 150 units long
+    var viewX = pos[0] - fromEye[0] * amountToMoveTowardEye;
+    var viewY = pos[1] - fromEye[1] * amountToMoveTowardEye;
+    var viewZ = pos[2] - fromEye[2] * amountToMoveTowardEye;
+    var desiredTextScale = -1 / gl.canvas.height; // 1x1 pixels
+    var scale = viewZ * desiredTextScale;
+    var textMatrix = m4.translate(projectionMatrix, viewX, viewY, viewZ);
+    // scale the F to the size we need it.
+    textMatrix = m4.scale(textMatrix, tex.width * scale, tex.height * scale, 1);
+    textMatrix = m4.translate(textMatrix, ii, 0, 0);
+
+    //console.log(textMatrix);
+    // // set texture uniform
+    //m4.copy(textMatrix, textUniforms.u_matrix);
+    textUniforms.u_texture = tex.texture;
+    webglUtils.setUniforms(textProgramInfo, textUniforms);
+
+    // Draw the text.
+    gl.drawElements(
+      gl.TRIANGLES,
+      textBufferInfo.numElements,
+      gl.UNSIGNED_SHORT,
+      0
+    );
   }
 
   /* Issue next frame paint */
