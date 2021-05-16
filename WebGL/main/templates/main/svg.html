@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+
+<body>
+
+
+<!-- 기본 도형 -->
+<svg width="1000" height="1000">
+  
+    <!-- 사격형 -->
+    <rect x="10" y="10" width="30" height="30"/>
+    <rect x="60" y="10" rx="10" ry="10" width="30" height="30"/>
+    <!-- 원 -->
+    <circle cx="25" cy="75" r="20"/>
+    <!-- 타원 -->
+    <ellipse cx="75" cy="75" rx="20" ry="5"/>
+    <!-- 선 -->
+    <line x1="80" x2="120" y1="110" y2="150" stroke="black"/>
+    <polyline points="100,100 150,25 150,75 200,0"
+    fill="none" stroke="black" />
+    <polygon points="200,200 250,125 250,175 300,100"
+            fill="none" stroke="black" />
+    <!-- 패스 -->
+    <!-- 모든 명령어 대문자는 절대위치, 소문자는 상대위치)
+        M x y === m dx dy
+    -->
+    <!-- 1.M은 이동 -->
+    <!-- 2.H는 가로선 V는 세로선 -->
+    <!-- 3.z는 패스 닫기 (현 위치에서 시작점으로) 대문자 소문자 차이 없음-->
+    <path d="M10 300 H 90 V 390 H 10 L 10 10 z"/>
+    <!-- 베지에 곡선 -->
+    <path d="M10 410 C 20 420, 40 420, 50 410 z" stroke="black" fill="transparent"/>
+    <!-- 곡선 반전 : S자 만들기  -->
+    <path d="M40 480 C 70 410, 95 410, 125 480 S 180 550, 210 480" stroke="black" fill="transparent"/>
+    <!-- 2차 베지에 곡선 -->
+    <path d="M10 580 Q 95 510 180 580" stroke="black" fill="transparent"/>
+    <!-- 2차 베지에 곡선 연결 : 명령어 T 사용 -->
+    <path d="M110 580 Q 152.5 510, 195 580 T 280 580" stroke="black" fill="transparent"/>
+
+    <path d="M80 680
+           A 45 45, 0, 0, 0, 125 725
+           L 125 680 Z" fill="green"/>
+    <path d="M230 680
+           A 45 45, 0, 1, 0, 275 725
+           L 275 680 Z" fill="red"/>
+    <path d="M80 830
+           A 45 45, 0, 0, 1, 125 875
+           L 125 830 Z" fill="purple"/>
+    <path d="M230 830
+           A 45 45, 0, 1, 1, 275 875
+           L 275 830 Z" fill="blue"/>
+</svg>
+
+
+
+</svg>
+
+</body>
+</html>
